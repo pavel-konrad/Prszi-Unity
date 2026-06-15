@@ -58,5 +58,15 @@ Speciální: **7** (lízni +2, kumulativně), **eso** (přeskoč), **dáma** (na
 
 ## Pokrytí (stav)
 
-Implementováno v `Core/`, čeká na **reálné** testy (dnes jen `Debug.Log` demo): S1.1, S1.3-4, S2.\*, S3.\*, S4.1-2, S5.1.
-Chybí kód (RED): S1.2 (deterministický shuffle), S4.3, S5.2, S6.1, S7.1, S8.1.
+**Pokryto EditMode testy (23 testů, zelené):**
+- S1.1–S1.4 — `DeckTests` (32 unikátních karet, deterministický shuffle, draw, prázdný balíček)
+- S2.1–S2.2, S3.1–S3.8 — `CardRulesTests` (Strategy: pravidla + speciální karty)
+- S4.1–S4.3, S5.1 — `GameFlowTests` (pořadí tahů, skip, wrap, vítěz)
+
+**Vyřešeno (bylo RED):** S1.2 — deterministický seedovaný shuffle (commit „S1.2 red→green").
+
+**Zbývá RED (blokováno migrací na `Core/`):**
+- S5.2 — vítězství = 0 karet (logika dnes ve starém `CardManager`)
+- S6.1 — přehození odhazovacího balíčku (ve starém `GameplayState`)
+- S7.1 — tah končí po líznutí (mimo `Core/`)
+- S8.1 — PlayMode boot smoke (po sjednocení wiringu)
