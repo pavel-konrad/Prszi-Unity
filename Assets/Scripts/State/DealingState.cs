@@ -39,7 +39,6 @@ public class DealingState : IGameState
             if (playerHand != null)
             {
                 playerHand.UpdateHand(GameSession.I.Human);
-                Debug.Log("[DealingState] PlayerHand UI aktualizován pro rozdání karet");
             }
         }
         else

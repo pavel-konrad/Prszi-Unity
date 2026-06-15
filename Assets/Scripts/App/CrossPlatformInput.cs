@@ -17,10 +17,7 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
     [Header("Settings")]
     public bool enableHapticFeedback = true; // Vibrace na mobilu
     public bool enableVisualFeedback = true; // Vizuální feedback
-    
-    [Header("Debug")]
-    public bool showDebugLogs = false;
-    
+
     private GameInputActions inputActions;
     private bool isMobilePlatform;
     private Vector2 lastInputPosition;
@@ -34,11 +31,6 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
         inputActions = new GameInputActions();
         inputActions.Player.SetCallbacks(this);
         
-        if (showDebugLogs)
-        {
-            Debug.Log($"[CrossPlatformInput] Platforma detekována: {(isMobilePlatform ? "Mobile" : "Desktop/Web")}");
-            Debug.Log($"[CrossPlatformInput] Unity Input System inicializován");
-        }
     }
     
     void OnEnable()
@@ -67,10 +59,6 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
             Vector2 position = inputActions.Player.Position.ReadValue<Vector2>();
             lastInputPosition = position;
             
-            if (showDebugLogs)
-            {
-                Debug.Log($"[CrossPlatformInput] Tap detected at: {position}");
-            }
             
             UIEvents.TriggerScreenTapped(position);
         }
@@ -83,10 +71,6 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
             Vector2 position = inputActions.Player.Position.ReadValue<Vector2>();
             lastInputPosition = position;
             
-            if (showDebugLogs)
-            {
-                Debug.Log($"[CrossPlatformInput] Press started at: {position}");
-            }
             
             UIEvents.TriggerScreenPressed(position);
             
@@ -101,10 +85,6 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
             Vector2 position = inputActions.Player.Position.ReadValue<Vector2>();
             lastInputPosition = position;
             
-            if (showDebugLogs)
-            {
-                Debug.Log($"[CrossPlatformInput] Press ended at: {position}");
-            }
             
             UIEvents.TriggerScreenReleased(position);
         }

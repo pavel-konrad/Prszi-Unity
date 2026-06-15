@@ -16,12 +16,6 @@ public class GameRootBinder : MonoBehaviour
         var gs = GameSession.I;
         if (gs == null) { Debug.LogError("[GameRootBinder] Chybí GameSession ve scéně."); return; }
         
-        // Debug: zkontrolovat reference
-        Debug.Log($"[GameRootBinder] Reference kontroluji:");
-        Debug.Log($"[GameRootBinder] human: {(human != null ? "OK" : "NULL")}");
-        Debug.Log($"[GameRootBinder] enemy1: {(enemy1 != null ? "OK" : "NULL")}");
-        Debug.Log($"[GameRootBinder] enemy2: {(enemy2 != null ? "OK" : "NULL")}");
-        Debug.Log($"[GameRootBinder] enemy3: {(enemy3 != null ? "OK" : "NULL")}");
         
         // GameRootBinder.Start()
         if (human  && gs.Players.Count > 0) human.Bind(gs.Players[0]);

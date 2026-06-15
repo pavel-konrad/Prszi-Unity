@@ -97,7 +97,6 @@ public class PlayerHand : MonoBehaviour
         // NESPOUŠTĚT UpdateHand() zde - to se spouští jen při rozdávání karet na začátku hry
         // Pro nové karty se používá AddCardToHand()
         
-        Debug.Log($"[PlayerHand] PlayerChanged event - NEspouštím UpdateHand pro {player.Name}");
     }
     
     // Spustit animaci rozdávání (volané z DealingState)
@@ -112,7 +111,6 @@ public class PlayerHand : MonoBehaviour
     
     void OnPlayerWon(Player winner)
     {
-        Debug.Log($"Hráč {winner.Name} vyhrál!");
         // Zde můžete přidat UI notifikaci o vítězi
     }
     
@@ -176,14 +174,9 @@ public class PlayerHand : MonoBehaviour
                     Debug.LogWarning($"[PlayerHand] Animator nebyl nalezen na {card.rank} of {card.suit}, vytvářím nový");
                 }
                 
-                // Debug: zkontrolovat Animator Controller
                 if (cardAnimator.runtimeAnimatorController == null)
                 {
                     Debug.LogWarning($"[PlayerHand] Animator na {card.rank} of {card.suit} nemá Animator Controller!");
-                }
-                else
-                {
-                    Debug.Log($"[PlayerHand] Animator Controller: {cardAnimator.runtimeAnimatorController.name}");
                 }
                 
                 // Zajistit, že má AnimationEventReceiver
@@ -200,7 +193,6 @@ public class PlayerHand : MonoBehaviour
                 // Přidat do seznamu
                 cardUIs.Add(cardUI);
                 
-                Debug.Log($"[PlayerHand] Karta {card.rank} of {card.suit} vytvořena s AnimationEventReceiver a Animator");
             }
             else
             {
@@ -228,7 +220,6 @@ public class PlayerHand : MonoBehaviour
             // Kontrola, zda lze kartu zahrát
             if (cardManager != null && cardManager.CanPlayCard(card))
             {
-                Debug.Log($"[PlayerHand] Hráč hraje kartu: {card.rank} of {card.suit}");
                 
                 // Najít CardUI komponentu pro tuto kartu
                 CardUI swipedCardUI = cardUIs.Find(cui => cui.card == card);
@@ -255,13 +246,8 @@ public class PlayerHand : MonoBehaviour
             }
             else
             {
-                Debug.Log($"[PlayerHand] Karta {card.rank} of {card.suit} není hratelná!");
                 // TODO: Zobrazit vizuální feedback (např. červený efekt)
             }
-        }
-        else
-        {
-            Debug.Log("[PlayerHand] Nejste na tahu nebo nemůžete hrát!");
         }
     }
     
@@ -273,7 +259,6 @@ public class PlayerHand : MonoBehaviour
         CardUI chargedCardUI = cardUIs.Find(cui => cui.card == card);
         if (chargedCardUI == null) return;
         
-        Debug.Log($"[PlayerHand] Karta {card.rank} of {card.suit} se nabila - vybíjím ostatní karty");
         
         // Vybit všechny ostatní karty
         foreach (var cardUI in cardUIs)
@@ -281,7 +266,6 @@ public class PlayerHand : MonoBehaviour
             if (cardUI != null && cardUI != chargedCardUI && cardUI.isCharged)
             {
                 cardUI.SetCharged(false);
-                Debug.Log($"[PlayerHand] Vybita karta: {cardUI.card?.rank} of {cardUI.card?.suit}");
             }
         }
     }
@@ -298,10 +282,6 @@ public class PlayerHand : MonoBehaviour
     {
         if (card == null || cardPrefab == null || cardContainer == null) return;
         
-        Debug.Log($"[PlayerHand] AddCardToHand voláno pro kartu: {card.rank} of {card.suit}");
-        Debug.Log($"[PlayerHand] cardPrefab: {(cardPrefab != null ? cardPrefab.name : "NULL")}");
-        Debug.Log($"[PlayerHand] cardContainer: {(cardContainer != null ? cardContainer.name : "NULL")}");
-        Debug.Log($"[PlayerHand] isInitialized: {isInitialized}");
         
         // Vytvořit novou kartu
         GameObject cardObj = Instantiate(cardPrefab, cardContainer);
@@ -362,7 +342,6 @@ public class PlayerHand : MonoBehaviour
                 if (hasCardInTrigger)
                 {
                     cardAnimator.SetTrigger("CardIn");
-                    Debug.Log($"[PlayerHand] CardIn trigger spuštěn pro nově přidanou kartu: {card.rank} of {card.suit}");
                 }
                 else
                 {
@@ -377,7 +356,6 @@ public class PlayerHand : MonoBehaviour
             // Přidat do seznamu
             cardUIs.Add(cardUI);
             
-            Debug.Log($"[PlayerHand] Nová karta {card.rank} of {card.suit} přidána s CardIn animací");
         }
         else
         {
@@ -390,7 +368,6 @@ public class PlayerHand : MonoBehaviour
     {
         if (card == null) return;
         
-        Debug.Log($"[PlayerHand] RemoveCard voláno pro kartu: {card.rank} of {card.suit}");
         
         // Najít a odebrat CardUI komponentu
         CardUI cardUIToRemove = null;
@@ -417,7 +394,6 @@ public class PlayerHand : MonoBehaviour
             // Přepočítat pozice zbývajících karet
             RecalculateCardPositions();
             
-            Debug.Log($"[PlayerHand] Karta {card.rank} of {card.suit} odebrána z UI, zbývá {cardUIs.Count} karet");
         }
         else
         {

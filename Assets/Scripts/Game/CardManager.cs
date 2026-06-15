@@ -33,29 +33,18 @@ public class CardManager : MonoBehaviour
         if (playerHandUI == null)
         {
             playerHandUI = FindObjectOfType<PlayerHand>();
-            if (playerHandUI != null)
-            {
-                Debug.Log("[CardManager] PlayerHand UI komponenta nalezena automaticky");
-            }
-            else
-            {
+            if (playerHandUI == null)
                 Debug.LogWarning("[CardManager] PlayerHand UI komponenta nebyla nalezena automaticky");
-            }
         }
-        
+
         // Automaticky najít AIHand UI komponenty
         if (aiHandUIs == null || aiHandUIs.Length == 0)
         {
             AIHand[] foundAIHands = FindObjectsOfType<AIHand>();
             if (foundAIHands.Length > 0)
-            {
                 aiHandUIs = foundAIHands;
-                Debug.Log($"[CardManager] Nalezeno {foundAIHands.Length} AIHand UI komponent automaticky");
-            }
             else
-            {
                 Debug.LogWarning("[CardManager] AIHand UI komponenty nebyly nalezeny automaticky");
-            }
         }
         
         // Kontrola AI hand stacků
@@ -167,7 +156,6 @@ public class CardManager : MonoBehaviour
         if (topCard != null)
         {
             discard.AddCard(topCard);
-            Debug.Log($"[CardManager] Otočena karta nahoru do discard: {topCard}");
         }
         else
         {
@@ -224,7 +212,6 @@ public class CardManager : MonoBehaviour
         player.RemoveCard(card);
         discard.AddCard(card);
 
-        Debug.Log($"[CardManager] Hráč {player.Name} odehrál kartu: {card}");
 
         // Apply the card's rule effect to the shared context before advancing the turn:
         // Seven → draw penalty, Ace → skip, Queen → forced suit, Regular → clears forced suit.
@@ -288,7 +275,6 @@ public class CardManager : MonoBehaviour
             }
             else
             {
-                Debug.Log($"[CardManager] AI {aiPlayer.Name} nemá platnou kartu");
             }
         }
     }
@@ -335,7 +321,6 @@ public class CardManager : MonoBehaviour
         {
             count = rules.PendingDrawCount;
             rules.ClearDrawPenalty();
-            Debug.Log($"[CardManager] Draw penalty active: {player.Name} draws {count} cards");
         }
 
         Card last = null;
@@ -349,18 +334,14 @@ public class CardManager : MonoBehaviour
     // Lízne jednu kartu pro hráče
     Card DrawOneForPlayer(Player player)
     {
-        Debug.Log($"[CardManager] DrawCardForPlayer voláno pro hráče: {player.Name}");
-        Debug.Log($"[CardManager] Stav balíčku před líznutím: deck.cards.Count={deck?.cards?.Count ?? -1}");
         
         // Pokud je balíček prázdný, přehodit odhazovací balíček pozpátku
         if (deck.cards.Count == 0)
         {
-            Debug.Log("[CardManager] Balíček je prázdný, přehazuji odhazovací balíček pozpátku");
             ReshuffleDiscardIntoDeck();
         }
         
         Card drawnCard = deck.DrawCard();
-        Debug.Log($"[CardManager] Líznutá karta: {drawnCard}");
         
         if (drawnCard != null)
         {
@@ -371,7 +352,6 @@ public class CardManager : MonoBehaviour
                 if (playerHandUI != null)
                 {
                     playerHandUI.AddCardToHand(drawnCard);
-                    Debug.Log($"[CardManager] Karta přidána do playerHandUI s CardIn animací");
                 }
                 else
                 {
@@ -380,7 +360,6 @@ public class CardManager : MonoBehaviour
                 
                 // Pak přidat do dat
                 playerHand.AddCard(drawnCard);
-                Debug.Log($"[CardManager] Karta přidána do playerHand stacku");
             }
             // Pro AI hráče přidat do odpovídajícího AI hand stacku
             else
@@ -395,7 +374,6 @@ public class CardManager : MonoBehaviour
                 if (aiHandUIs != null && aiIndex >= 0 && aiIndex < aiHandUIs.Length && aiHandUIs[aiIndex] != null)
                 {
                     aiHandUIs[aiIndex].AddCard(drawnCard);
-                    Debug.Log($"[CardManager] AI karta přidána do aiHandUI[{aiIndex}] s CardIn animací");
                 }
                 else
                 {
@@ -406,7 +384,6 @@ public class CardManager : MonoBehaviour
             // Přidat kartu do dat hráče (pro všechny hráče)
             player.AddCard(drawnCard);
             
-            Debug.Log($"[CardManager] Hráč {player.Name} si líznul kartu: {drawnCard}");
         }
         else
         {
@@ -440,7 +417,6 @@ public class CardManager : MonoBehaviour
         discard.Clear();
         discard.AddCard(topCard);
         
-        Debug.Log($"[CardManager] Odhazovací balíček byl přehozen zpět do balíčku pozpátku (bez míchání). Vrchní karta: {topCard}");
     }
     
     public void DiscardPlayerCard(Card card)

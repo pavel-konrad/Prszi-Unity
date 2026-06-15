@@ -15,7 +15,6 @@ public void OnStartClicked()
     var sprite = avatarPicker ? avatarPicker.SelectedSprite : null;
     int idx    = avatarPicker ? avatarPicker.SelectedIndex : 0;
 
-    Debug.Log($"[MainMenu] Start: name='{n}', sprite={(sprite? sprite.name : "NULL")}, idx={idx}");
 
     if (GameSession.I != null)
         GameSession.I.ApplyHumanFromMenu(n, sprite, idx);

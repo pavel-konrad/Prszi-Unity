@@ -31,12 +31,9 @@ public class AvatarStateView : MonoBehaviour
         
         if (frameAnimator != null)
         {
-            Debug.Log($"[AvatarStateView] Setting IsActive = {on} for {gameObject.name}");
             frameAnimator.SetBool("IsActive", on);
             
-            // Debug: vypsat aktuální stav animatoru
             var currentState = frameAnimator.GetCurrentAnimatorStateInfo(0);
-            Debug.Log($"[AvatarStateView] Current animator state: {currentState.shortNameHash} for {gameObject.name}");
         }
         else
         {

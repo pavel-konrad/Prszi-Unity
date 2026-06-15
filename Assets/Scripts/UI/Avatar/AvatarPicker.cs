@@ -35,7 +35,6 @@ public class AvatarPicker : MonoBehaviour
 	if (previewImage && sprite){ previewImage.enabled=true; previewImage.sprite = sprite; }
 	if (previewAnimator) 
 	{
-		Debug.Log($"[AvatarPicker] Spouštím Pop trigger");
 		previewAnimator.SetTrigger("Pop");
 		// Zvuk se spustí přes Animation Event
 	}

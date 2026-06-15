@@ -29,7 +29,6 @@ public class Player : IPlayerData
         get => isActive;
         set { 
             if (isActive == value) return; 
-            Debug.Log($"[Player] {Name} IsActive: {isActive} → {value}");
             isActive = value; 
             Changed?.Invoke(this); 
         }
@@ -42,13 +41,11 @@ public class Player : IPlayerData
         Id = id; 
         Name = name; 
         IsHuman = isHuman; 
-        Debug.Log($"[Player] Konstruktor: Vytvořen hráč ID={id}, Name={name}, IsHuman={isHuman}");
     }
 
     public void SetName(string n){ Name = string.IsNullOrWhiteSpace(n) ? "Player" : n.Trim(); Changed?.Invoke(this); }
     public void SetAvatar(Sprite s, int idx){ Avatar=s; AvatarIndex=idx; Changed?.Invoke(this); }
     public void SetCash(int v){ 
-        Debug.Log($"[Player] SetCash pro {Name}: {Cash} -> {Mathf.Max(0,v)}");
         Cash=Mathf.Max(0,v); 
         Changed?.Invoke(this); 
     }
@@ -64,7 +61,6 @@ public class Player : IPlayerData
         int amount = Mathf.Min(Bet, Cash);
         if (amount <= 0) return 0;
 
-        Debug.Log($"[Player] PlaceBet pro {Name}: Cash {Cash} -> {Cash - amount}, Staked {Staked} -> {Staked + amount}");
         Cash  -= amount;
         Staked += amount;
         Changed?.Invoke(this);
@@ -83,7 +79,6 @@ public class Player : IPlayerData
     public void RefundStake()
     {
         if (Staked <= 0) return;
-        Debug.Log($"[Player] RefundStake pro {Name}: Cash {Cash} -> {Cash + Staked}, Staked {Staked} -> 0");
         Cash += Staked;
         Staked = 0;
         Changed?.Invoke(this);
@@ -93,7 +88,6 @@ public class Player : IPlayerData
     public void Payout(int amount)
     {
         if (amount <= 0) return;
-        Debug.Log($"[Player] Payout pro {Name}: Cash {Cash} -> {Cash + amount}");
         Cash += amount;
         Changed?.Invoke(this);
     }

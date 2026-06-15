@@ -17,20 +17,17 @@ public class Card : ICardData
     {
         suit = s;
         rank = r;
-        Debug.Log($"[Card] Vytvářím kartu: {rank} of {suit}");
         LoadSprite();
     }
     
     void LoadSprite()
     {
-        Debug.Log($"[Card] LoadSprite pro {rank} of {suit}");
         
         // Zajistit existenci CardSpriteManager
         CardSpriteManager spriteManager = CardSpriteManager.EnsureInstance();
         
         if (spriteManager != null)
         {
-            Debug.Log("[Card] CardSpriteManager nalezen");
             
             // Zkusit načíst hotový sprite
             cardSprite = spriteManager.GetCardSprite(suit, rank);
@@ -38,11 +35,9 @@ public class Card : ICardData
             // Pokud není hotový sprite, vytvořit z symbolů
             if (cardSprite == null)
             {
-                Debug.Log("[Card] Hotový sprite nenalezen, zkouším vytvořit z symbolů");
                 cardSprite = spriteManager.CreateCardSpriteFromSymbols(suit, rank);
             }
             
-            Debug.Log($"[Card] Výsledný sprite: {(cardSprite != null ? cardSprite.name : "null")}");
         }
         else
         {

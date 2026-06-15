@@ -100,7 +100,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         
         // Přidat AnimationEventReceiver pokud neexistuje
         AnimationEventReceiver.EnsureComponent(gameObject);
-        Debug.Log($"[CardUI] AnimationEventReceiver zajištěn pro kartu: {gameObject.name}");
         
         // Uložit původní hodnoty
         originalScale = transform.localScale;
@@ -141,13 +140,11 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         {
             OnCardCharged?.Invoke(card);
             UIEvents.TriggerCardCharged(card);
-            Debug.Log($"[CardUI] Karta {card?.rank} of {card?.suit} se NABILA");
         }
         else
         {
             OnCardDischarged?.Invoke(card);
             UIEvents.TriggerCardDischarged(card);
-            Debug.Log($"[CardUI] Karta {card?.rank} of {card?.suit} se VYBILA");
         }
     }
     
@@ -159,15 +156,11 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             return;
         }
         
-        Debug.Log($"[CardUI] UpdateDisplay pro kartu: {card.rank} of {card.suit}");
-        Debug.Log($"[CardUI] cardImage: {(cardImage != null ? "nalezen" : "null")}");
-        Debug.Log($"[CardUI] card.cardSprite: {(card.cardSprite != null ? "nalezen" : "null")}");
         
         // Nastavit sprite karty
         if (cardImage != null && card.cardSprite != null)
         {
             cardImage.sprite = card.cardSprite;
-            Debug.Log($"[CardUI] Sprite nastaven: {card.cardSprite.name}");
         }
         else
         {
@@ -178,7 +171,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         if (cardText != null)
         {
             cardText.text = $"{card.rank}\n{card.suit}";
-            Debug.Log($"[CardUI] Text nastaven: {cardText.text}");
         }
         
         // Nastavit value text
@@ -234,7 +226,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             if (hasIsCharged)
             {
                 cardAnimator.SetBool("IsCharged", isCharged);
-                Debug.Log($"[CardUI] Animator parametr IsCharged nastaven na: {isCharged}");
             }
             else
             {
@@ -320,7 +311,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         // Pokud to byl swipe, neprovádět tap akci
         if (wasSwipe) 
         {
-            Debug.Log($"[CardUI] Ignoruji tap - byl to swipe");
             return;
         }
         
@@ -328,7 +318,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         #if UNITY_ANDROID || UNITY_IOS
         if (!wasTap)
         {
-            Debug.Log($"[CardUI] Ignoruji tap - nebyl detekován jako tap");
             return;
         }
         #endif
@@ -350,7 +339,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             if (hasClickTrigger)
             {
                 cardAnimator.SetTrigger("Click");
-                Debug.Log($"[CardUI] Trigger 'Click' spuštěn");
             }
             else
             {
@@ -426,13 +414,11 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         float swipeTime = Time.time - touchStartTime;
         float swipeDistance = Vector2.Distance(touchStartPos, endPos);
         
-        Debug.Log($"[CardUI] Touch check: distance={swipeDistance}, time={swipeTime}, minSwipe={minSwipeDistance}, maxTap={maxTapDistance}, isCharged={isCharged}");
         
         // Detekce tap (krátký pohyb)
         if (swipeDistance <= maxTapDistance && swipeTime <= 0.3f)
         {
             wasTap = true;
-            Debug.Log($"[CardUI] Tap detekován - karta se nabije/vybije");
             return; // Ukončit - je to tap (nabití/vybití)
         }
         
@@ -443,12 +429,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             Vector2 swipeDirection = (endPos - touchStartPos).normalized;
             float verticalComponent = swipeDirection.y;
             
-            Debug.Log($"[CardUI] Swipe direction: {swipeDirection}, vertical: {verticalComponent}");
             
             // Swipe nahoru (vertical > 0.5 znamená více nahoru než do stran)
             if (verticalComponent > 0.5f)
             {
-                Debug.Log($"[CardUI] Swipe nahoru detekován! Karta {card?.rank} of {card?.suit} jde do discard");
                 wasSwipe = true; // Označit jako swipe
                 shouldToggleCharge = false; // Zabránit přepnutí nabití v OnPointerClick
                 
@@ -469,7 +453,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
                     if (hasSwipedUpTrigger)
                     {
                         cardAnimator.SetTrigger("SwipedUp");
-                        Debug.Log($"[CardUI] Animace SwipedUp spuštěna pro kartu {card?.rank} of {card?.suit}");
                     }
                 }
                 
@@ -482,16 +465,6 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
                 
                 return; // Ukončit metodu po swipu
             }
-        }
-        else if (swipeDistance >= minSwipeDistance && swipeTime <= maxSwipeTime && !isCharged)
-        {
-            Debug.Log($"[CardUI] Swipe detekován, ale karta není nabitá (isCharged={isCharged}) - ignoruji swipe");
-        }
-        
-        // Pokud to není ani tap ani swipe, nechat kartu nabitou (pokud už je nabitá)
-        if (isCharged)
-        {
-            Debug.Log($"[CardUI] Není ani tap ani swipe - karta zůstává nabitá");
         }
     }
     

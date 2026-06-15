@@ -53,7 +53,6 @@ namespace Prsi.Core.Services
             
             Shuffle();
             
-            Debug.Log($"[CardDeckService] Balíček inicializován s {deck.Count} kartami (polymorfní typy)");
         }
         
         /// <summary>

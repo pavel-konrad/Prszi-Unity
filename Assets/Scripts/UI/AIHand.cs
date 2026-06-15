@@ -67,7 +67,6 @@ public class AIHand : MonoBehaviour
     
     public void UpdateHand(Player player)
     {
-        Debug.Log($"[AIHand] {name} - UpdateHand voláno pro hráče: {player?.Name}");
         
         if (cardContainer == null)
         {
@@ -83,7 +82,6 @@ public class AIHand : MonoBehaviour
         
         // Clear existing cards
         int existingCards = cardContainer.childCount;
-        Debug.Log($"[AIHand] {name} - Mažu {existingCards} existujících karet");
         
         // Použít DestroyImmediate pro okamžité odstranění
         while (cardContainer.childCount > 0)
@@ -92,7 +90,6 @@ public class AIHand : MonoBehaviour
             DestroyImmediate(child.gameObject);
         }
         
-        Debug.Log($"[AIHand] {name} - Po mazání zbývá {cardContainer.childCount} karet");
         
         // Použít počet karet z CardStack, pokud je dostupný
         int cardCount = player.hand.Count;
@@ -101,7 +98,6 @@ public class AIHand : MonoBehaviour
             cardCount = cardStack.Count;
         }
         
-        Debug.Log($"[AIHand] {name} - Vytvářím {cardCount} karet (player.hand.Count={player.hand.Count}, cardStack.Count={cardStack?.Count ?? -1})");
         
         // Automaticky přizpůsobit mezery podle počtu karet
         float cardSpacing = CalculateCardSpacing(cardCount);
@@ -134,7 +130,6 @@ public class AIHand : MonoBehaviour
             AnimationEventReceiver.EnsureComponent(cardBackObj);
         }
         
-        Debug.Log($"[AIHand] {name} - Vytvořeno {cardCount} karet, aktuální childCount: {cardContainer.childCount}");
     }
     
     // Spustit animaci rozdávání (volané z DealingState)
@@ -261,7 +256,6 @@ public class AIHand : MonoBehaviour
             if (hasCardInTrigger)
             {
                 cardAnimator.SetTrigger("CardIn");
-                Debug.Log($"[AIHand] CardIn trigger spuštěn pro nově přidanou AI kartu: {card.rank} of {card.suit}");
             }
             else
             {
@@ -269,7 +263,6 @@ public class AIHand : MonoBehaviour
             }
         }
         
-        Debug.Log($"[AIHand] Nová AI karta {card.rank} of {card.suit} přidána s CardIn animací");
     }
     
     // Odebrat kartu z AI ruky
@@ -277,7 +270,6 @@ public class AIHand : MonoBehaviour
     {
         if (card == null || cardContainer == null) return;
         
-        Debug.Log($"[AIHand] {name} - RemoveCard voláno pro kartu: {card.rank} of {card.suit}");
         
         // Najít a odebrat kartu z UI
         for (int i = 0; i < cardContainer.childCount; i++)
@@ -291,7 +283,6 @@ public class AIHand : MonoBehaviour
                 // Přepočítat pozice zbývajících karet
                 RecalculateCardPositions();
                 
-                Debug.Log($"[AIHand] {name} - Karta {card.rank} of {card.suit} odebrána z UI, zbývá {cardContainer.childCount - 1} karet");
                 return;
             }
         }

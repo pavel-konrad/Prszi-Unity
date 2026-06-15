@@ -63,8 +63,6 @@ public class GameSession : MonoBehaviour
         // Build the shared rule context over the live players (Player : IPlayerData).
         Rules = new GameContext(null, null, new List<IPlayerData>(_players));
 
-        // Debug: zkontrolovat finální stav po všech inicializacích
-        Debug.Log($"[GameSession] Po všech inicializacích: Human player (ID {Human.Id}, Name {Human.Name}) IsHuman: {Human.IsHuman}");
     }
 
     void Start()
@@ -87,16 +85,11 @@ public class GameSession : MonoBehaviour
     {
         yield return null;
         
-        // Debug: zkontrolovat PlayerUI komponenty a automaticky je propojit
         PlayerUI[] playerUIs = FindObjectsOfType<PlayerUI>();
-        Debug.Log($"[GameSession] Nalezeno {playerUIs.Length} PlayerUI komponent");
         
         for (int i = 0; i < playerUIs.Length && i < _players.Count; i++)
         {
-            Debug.Log($"[GameSession] PlayerUI {i}: {playerUIs[i].name}, před bindingem: {(playerUIs[i].Bound?.Name ?? "NULL")}");
-            Debug.Log($"[GameSession] PlayerUI {i} animátory - potAnimator: {(playerUIs[i].potAnimator != null ? "OK" : "NULL")}, cashAnimator: {(playerUIs[i].cashAnimator != null ? "OK" : "NULL")}");
             playerUIs[i].Bind(_players[i]);
-            Debug.Log($"[GameSession] PlayerUI {i}: {playerUIs[i].name}, po bindingu: {(playerUIs[i].Bound?.Name ?? "NULL")}");
         }
         
         foreach (var p in _players) p.NotifyChanged();
@@ -138,13 +131,6 @@ public class GameSession : MonoBehaviour
         PotChanged?.Invoke(Pot);
         SessionChanged?.Invoke();
     }
-
-    // Start nové hry - resetuje stav kola
-    // public void StartNewGame() // Odstraněno
-    // {
-    //     isRoundStarted = false;
-    //     StartNewRound();
-    // }
 
     public void ApplyHumanFromMenu(string name, Sprite avatar, int avatarIndex, int? chosenBet = null)
     {
@@ -244,15 +230,12 @@ public class GameSession : MonoBehaviour
             bool isHuman = (id == 0);
             string name = isHuman ? "Player" : $"AI Player {id}";
             _players.Add(new Player(id, name, isHuman));
-            Debug.Log($"[GameSession] Vytvořen hráč: ID={id}, Name={name}, IsHuman={isHuman}");
         }
 
         // výchozí ekonomika pro humana (když nebyla nastavena ze scény)
         if (_players[0].Cash <= 0) _players[0].SetCash(startingCash);
         if (_players[0].Bet  <= 0) _players[0].SetBet(BetRules.ClampToPreset(defaultBet));
         
-        // Debug: zkontrolovat stav po vytvoření
-        Debug.Log($"[GameSession] Po EnsurePlayers: Human player (ID {Human.Id}, Name {Human.Name}) IsHuman: {Human.IsHuman}");
     }
 
     void ApplyHumanPrefsIfAny()
@@ -271,12 +254,9 @@ public class GameSession : MonoBehaviour
         var usedNameIdx   = new HashSet<int>();
         var usedAvatarIdx = new HashSet<int>();
 
-        Debug.Log($"[GameSession] RandomizeAI: Začínám s {_players.Count} hráči");
-        Debug.Log($"[GameSession] RandomizeAI: Human player před randomizací: ID={Human.Id}, Name={Human.Name}, IsHuman={Human.IsHuman}");
 
         for (int i = 1; i < _players.Count; i++)
         {
-            Debug.Log($"[GameSession] RandomizeAI: Zpracovávám AI hráče {i}: ID={_players[i].Id}, Name={_players[i].Name}, IsHuman={_players[i].IsHuman}");
             
             // jméno
             string aiName = _players[i].Name;
@@ -300,7 +280,6 @@ public class GameSession : MonoBehaviour
                 _players[i].SetBet(BetRules.RandomAffordable(_players[i].Cash));
         }
         
-        Debug.Log($"[GameSession] RandomizeAI: Human player po randomizaci: ID={Human.Id}, Name={Human.Name}, IsHuman={Human.IsHuman}");
     }
     
     // Propojit AI hráče s AIHand UI komponentami

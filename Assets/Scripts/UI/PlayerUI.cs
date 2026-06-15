@@ -14,19 +14,6 @@ public class PlayerUI : MonoBehaviour
 	Player bound;
 	public Player Bound => bound; // Pro debug
 	int lastCash, lastStaked;
-	
-	void Awake()
-	{
-		Debug.Log($"[PlayerUI] Awake - potAnimator: {(potAnimator != null ? "OK" : "NULL")}, cashAnimator: {(cashAnimator != null ? "OK" : "NULL")}");
-		if (potAnimator != null)
-		{
-			Debug.Log($"[PlayerUI] PotAnimator Controller: {(potAnimator.runtimeAnimatorController != null ? "OK" : "NULL")}");
-		}
-		if (cashAnimator != null)
-		{
-			Debug.Log($"[PlayerUI] CashAnimator Controller: {(cashAnimator.runtimeAnimatorController != null ? "OK" : "NULL")}");
-		}
-	}
 
 	public void Bind(Player p)
 	{
@@ -51,34 +38,17 @@ public class PlayerUI : MonoBehaviour
 	void Refresh()
 	{
 		if (bound == null) return;
-		Debug.Log($"[PlayerUI] Refresh pro {bound.Name}: Cash={bound.Cash}, lastCash={lastCash}");
 
 		if (nameText) nameText.text = bound.Name;
 		
 		// Animované změny pro Cash
 		if (cashText && bound.Cash != lastCash)
 		{
-			Debug.Log($"[PlayerUI] Cash změna pro {bound.Name}: {lastCash} -> {bound.Cash}");
-			Debug.Log($"[PlayerUI] cashText: {(cashText != null ? "OK" : "NULL")}");
 			
 			// OKAMŽITĚ spustit animaci cash (zvuk se spustí přes Animation Event)
 			if (cashAnimator != null)
 			{
-				Debug.Log($"[PlayerUI] OKAMŽITĚ spouštím CashChanged trigger pro {bound.Name}");
-				Debug.Log($"[PlayerUI] CashAnimator Controller: {(cashAnimator.runtimeAnimatorController != null ? "OK" : "NULL")}");
-				
-				// Zkontrolovat dostupné parametry
-				Debug.Log($"[PlayerUI] CashAnimator parametry:");
-				foreach (var param in cashAnimator.parameters)
-				{
-					Debug.Log($"[PlayerUI] - {param.name} ({param.type})");
-				}
-				
 				cashAnimator.SetTrigger("CashChanged");
-				Debug.Log($"[PlayerUI] CashChanged trigger OKAMŽITĚ spuštěn pro {bound.Name}");
-				
-				// Zkontrolovat aktuální stav
-				Debug.Log($"[PlayerUI] Aktuální stav: {cashAnimator.GetCurrentAnimatorStateInfo(0).IsName("CashChanged")}");
 			}
 			else
 			{
@@ -101,7 +71,6 @@ public class PlayerUI : MonoBehaviour
 					// OKAMŽITĚ spustit animaci potu (zvuk se spustí přes Animation Event)
 					if (potAnimator != null)
 					{
-						Debug.Log($"[PlayerUI] OKAMŽITĚ spouštím PotAnimate trigger pro {bound.Name}");
 						potAnimator.SetTrigger("PotAnimate");
 					}
 					else
@@ -136,7 +105,6 @@ public class PlayerUI : MonoBehaviour
 
 		if (stateView) 
 		{
-			Debug.Log($"[PlayerUI] Setting {bound.Name} stateView.SetActive({bound.IsActive})");
 			stateView.SetActive(bound.IsActive);
 		}
 	}
@@ -144,7 +112,6 @@ public class PlayerUI : MonoBehaviour
 	// Animace čísla od startValue do endValue
 	IEnumerator AnimateNumber(TMP_Text text, int startValue, int endValue, float duration)
 	{
-		Debug.Log($"[PlayerUI] AnimateNumber začíná: {startValue} -> {endValue}, duration: {duration}");
 		Color originalColor = text.color;
 		Color targetColor = endValue > startValue ? Color.green : Color.red;
 		
@@ -169,7 +136,6 @@ public class PlayerUI : MonoBehaviour
 		text.text = endValue.ToString();
 		text.color = originalColor;
 		
-		Debug.Log($"[PlayerUI] AnimateNumber dokončeno");
 	}
 
 	// Volitelně: přímá změna avatara z UI (nepřepisuje Player objekt)

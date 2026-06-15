@@ -74,7 +74,6 @@ public class DiscardPile : MonoBehaviour
         
         currentTopCard = topCard;
         
-        Debug.Log($"[DiscardPile] Zobrazuji vrchní kartu: {topCard}");
         
         // Spustit animaci příchodu karty
         if (cardAnimator != null)
@@ -92,17 +91,14 @@ public class DiscardPile : MonoBehaviour
     // Nastavit obsah karty (bez animace)
     private void SetCardContent(Card card)
     {
-        Debug.Log($"[DiscardPile] SetCardContent voláno pro kartu: {card}, sprite: {(card.cardSprite != null ? "OK" : "NULL")}");
         
         // Nastavit sprite karty
         if (cardImage != null)
         {
             cardImage.enabled = true;
-            Debug.Log("[DiscardPile] cardImage.enabled nastaveno na true");
             if (card.cardSprite != null)
             {
                 cardImage.sprite = card.cardSprite;
-                Debug.Log($"[DiscardPile] Sprite nastaven: {card.cardSprite.name}");
             }
             else
             {

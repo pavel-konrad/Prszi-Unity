@@ -148,7 +148,6 @@ public class AnimationEventReceiver : MonoBehaviour
     {
         // Tato metoda se volá z Animation Event na konci animace swipu
         // Karta se může nyní bezpečně odstranit z ruky
-        Debug.Log("[AnimationEventReceiver] Animace swipu dokončena - karta se může odstranit");
         
         // Vyvolat událost dokončení animace
         var cardUI = GetComponent<CardUI>();

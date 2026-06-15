@@ -17,14 +17,10 @@ public class GameplayState : IGameState
     
     public void Enter()
     {
-        Debug.Log("[GameplayState] Entering gameplay state");
         
-        // Debug: zkontrolovat všechny hráče při vstupu do gameplay state
-        Debug.Log($"[GameplayState] Při vstupu do gameplay state:");
         for (int i = 0; i < GameSession.I.Players.Count; i++)
         {
             var player = GameSession.I.Players[i];
-            Debug.Log($"[GameplayState] Hráč {i}: ID={player.Id}, Name={player.Name}, IsHuman={player.IsHuman}, CanPlay={player.CanPlay}");
         }
         
         // Najít CardManager
@@ -69,16 +65,13 @@ public class GameplayState : IGameState
             ? GameSession.I.Players[GameSession.I.ActiveIndex] 
             : null;
             
-        Debug.Log($"[GameplayState] CheckActivePlayer: ActiveIndex={GameSession.I.ActiveIndex}, activePlayer={activePlayer?.Name ?? "null"}, IsHuman={activePlayer?.IsHuman}, CanPlay={activePlayer?.CanPlay}");
             
         if (activePlayer != null && !activePlayer.IsHuman && activePlayer.CanPlay)
         {
-            Debug.Log($"[GameplayState] AI hráč {activePlayer.Name} je na tahu");
             _runner.StartCoroutine(ProcessAITurn(activePlayer));
         }
         else if (activePlayer != null && activePlayer.IsHuman)
         {
-            Debug.Log($"[GameplayState] Human hráč {activePlayer.Name} je na tahu - čekám na UI input");
             // Human hráč hraje přes UI - nic dalšího nedělat
             // Tah se zastaví zde a čeká na UI interakci
         }
@@ -111,19 +104,16 @@ public class GameplayState : IGameState
         if (playableCard != null)
         {
             // AI může hrát kartu
-            Debug.Log($"[GameplayState] AI {aiPlayer.Name} hraje kartu: {playableCard}");
             cardManager.PlayCard(aiPlayer, playableCard);
         }
         else
         {
             // AI nemá platnou kartu - musí si líznout
-            Debug.Log($"[GameplayState] AI {aiPlayer.Name} nemá platnou kartu, lízne si");
             cardManager.DrawCardForPlayer(aiPlayer); // Použít synchronní metodu pro AI
             
             // V Prší: po líznutí karty automaticky končí tah, i když je karta hratelná
             yield return new WaitForSeconds(0.5f);
             
-            Debug.Log($"[GameplayState] AI {aiPlayer.Name} si líznul kartu, předávám tah");
             GameSession.I.ActivateNextPlayer();
             // NEREKURZIVNĚ - OnActivePlayerChanged se postará o CheckActivePlayer()
         }
@@ -189,7 +179,6 @@ public class GameplayState : IGameState
                 }
             }
             
-            Debug.Log($"[GameplayState] Hráč {player.Name} si líznul kartu: {drawnCard}");
         }
         else
         {
@@ -219,13 +208,11 @@ public class GameplayState : IGameState
         cardManager.discard.Clear();
         cardManager.discard.AddCard(topCard);
         
-        Debug.Log($"[GameplayState] Odhazovací balíček byl přehozen zpět do balíčku pozpátku (bez míchání). Vrchní karta: {topCard}");
     }
     
     // Volá se když se změní aktivní hráč
     void OnActivePlayerChanged(Player activePlayer, int activeIndex)
     {
-        Debug.Log($"[GameplayState] Změna aktivního hráče na: {activePlayer?.Name ?? "null"} (index {activeIndex}), IsHuman={activePlayer?.IsHuman}, CanPlay={activePlayer?.CanPlay}");
         // Zkontrolovat nového aktivního hráče
         CheckActivePlayer();
     }
@@ -233,7 +220,6 @@ public class GameplayState : IGameState
     // Volá se když hráč vyhraje
     void OnPlayerWon(Player winner)
     {
-        Debug.Log($"[GameplayState] Hráč {winner.Name} vyhrál!");
         
         // Vyplatit bank vítězi
         GameSession.I.PayoutToWinner(winner.Id);

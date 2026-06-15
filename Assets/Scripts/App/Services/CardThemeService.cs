@@ -56,7 +56,6 @@ namespace Prsi.Core.Services
             }
             
             currentTheme = theme;
-            Debug.Log($"[CardThemeService] Téma nastaveno: {theme.displayName}");
         }
         
         public void SetTheme(CardThemeDB themeDB)
