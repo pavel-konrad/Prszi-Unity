@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Prsi.Core;
+using Prsi.Core.Cards;
 
 [Serializable]
-public class Player
+public class Player : IPlayerData
 {
     public int Id;
     public string Name;
@@ -154,4 +156,16 @@ public class Player
     
     /// Zkontroluje zda je hráč stále ve hře
     public bool IsInGame => !hasFolded;
+
+    // === Prsi.Core bridge (explicit IPlayerData implementation) ===
+    // Explicit impls map the public fields onto the domain interface without
+    // renaming fields or touching Unity serialization. HasWon/CanPlay/IsInGame
+    // already match IPlayerData and implement it implicitly.
+    int IPlayerData.Id => Id;
+    string IPlayerData.Name => Name;
+    bool IPlayerData.IsHuman => IsHuman;
+    Sprite IPlayerData.Avatar => Avatar;
+    int IPlayerData.Cash => Cash;
+    int IPlayerData.Bet => Bet;
+    IReadOnlyList<ICardData> IPlayerData.Hand => hand;
 }

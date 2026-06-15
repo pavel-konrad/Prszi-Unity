@@ -1,12 +1,17 @@
 using UnityEngine;
+using Prsi.Core;
 using Prsi.Core.Cards;
 
 [System.Serializable]
-public class Card
+public class Card : ICardData
 {
     public Suit suit;
     public Rank rank;
     public Sprite cardSprite;
+
+    // Bridge to Prsi.Core: the legacy card speaks the domain language (ICardData).
+    public Suit Suit => suit;
+    public Rank Rank => rank;
     
     public Card(Suit s, Rank r)
     {
