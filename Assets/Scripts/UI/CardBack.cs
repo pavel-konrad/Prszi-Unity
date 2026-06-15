@@ -73,16 +73,13 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
         Card drawnCard = cardManager.DrawCardForPlayer(human);
         
         if (drawnCard != null)
-        {
-            Debug.Log($"[CardBack] Úspěšně líznutá karta: {drawnCard}");
-            
-            // V Prší: po líznutí karty automaticky končí tah, i když je karta hratelná
             Debug.Log($"[CardBack] Hráč si líznul kartu {drawnCard}, předávám tah");
-            GameSession.I.ActivateNextPlayer();
-        }
         else
-        {
-            Debug.LogError("[CardBack] Nepodařilo se líznout kartu!");
-        }
+            // Deck and discard are exhausted (a legal late-game state, not a bug).
+            // Pass the turn anyway so the human can't soft-lock on the empty deck.
+            Debug.LogWarning("[CardBack] Žádná karta k líznutí (balíček i odhazovací prázdné), předávám tah");
+
+        // In Prší drawing ends the turn — pass even if no card could be drawn.
+        GameSession.I.ActivateNextPlayer();
     }
 }

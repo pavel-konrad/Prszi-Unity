@@ -173,6 +173,10 @@ public class CardManager : MonoBehaviour
         {
             Debug.LogError("[CardManager] Chyba: nemohu otočit kartu nahoru - balíček je prázdný!");
         }
+
+#if UNITY_EDITOR
+        AssertCardCount("deal");
+#endif
     }
     
     // Hráč odehrál kartu
@@ -249,6 +253,9 @@ public class CardManager : MonoBehaviour
     // Win check + advance, shared by the inline and deferred (Queen modal) play paths.
     void FinishPlay(Player player)
     {
+#if UNITY_EDITOR
+        AssertCardCount("play");
+#endif
         if (player.HasWon)
             OnPlayerWon?.Invoke(player);
         else
@@ -333,6 +340,9 @@ public class CardManager : MonoBehaviour
 
         Card last = null;
         for (int i = 0; i < count; i++) last = DrawOneForPlayer(player);
+#if UNITY_EDITOR
+        AssertCardCount("draw");
+#endif
         return last;
     }
 
@@ -400,9 +410,11 @@ public class CardManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[CardManager] Nelze líznout kartu - balíček je prázdný!");
+            // Deck empty and discard had nothing to recycle (only its top card):
+            // a legal late-game exhaustion, not an error.
+            Debug.LogWarning("[CardManager] Balíček i odhazovací jsou vyčerpané - nelze líznout");
         }
-        
+
         return drawnCard;
     }
     
@@ -480,6 +492,22 @@ public class CardManager : MonoBehaviour
         return playersWithCards <= 1; // Konec hry když zůstane max 1 hráč s kartami
     }
     
+#if UNITY_EDITOR
+    // Editor-only instrumentation: every physical card must live in exactly one
+    // place (deck, discard, or a hand). If the total drifts from 32, cards are
+    // being lost or duplicated — log where so the leak can be traced.
+    void AssertCardCount(string where)
+    {
+        int total = (deck?.cards?.Count ?? 0) + (discard?.cards?.Count ?? 0)
+                  + (playerHand?.cards?.Count ?? 0);
+        if (aiHands != null)
+            foreach (var h in aiHands) total += h?.cards?.Count ?? 0;
+
+        if (total != 32)
+            Debug.LogWarning($"[CardManager] Card-count invariant broken after {where}: {total}/32");
+    }
+#endif
+
     // Najít vítěze
     public Player GetWinner()
     {
