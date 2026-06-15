@@ -92,5 +92,20 @@ namespace Prsi.Tests.EditMode
             Assert.IsTrue(ctx.IsGameOver);
             Assert.AreSame(winner, notified);
         }
+
+        [Test] // ResetRoundState clears forced suit, penalty and skip
+        public void ResetRoundState_ClearsTransientEffects()
+        {
+            var ctx = CtxWith(2);
+            ctx.NotifyDrawPenalty(4);
+            ctx.NotifySuitChanged(Suit.Clubs);
+            ctx.SkipNextPlayer = true;
+
+            ctx.ResetRoundState();
+
+            Assert.AreEqual(0, ctx.PendingDrawCount);
+            Assert.IsNull(ctx.ForcedSuit);
+            Assert.IsFalse(ctx.SkipNextPlayer);
+        }
     }
 }

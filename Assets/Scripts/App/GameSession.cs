@@ -198,32 +198,35 @@ public class GameSession : MonoBehaviour
     }
     
     /// Získá index dalšího hráče v pořadí
-    public int GetNextPlayerIndex()
+    public int GetNextPlayerIndex() => NextPlayableAfter(ActiveIndex);
+
+    /// Next player after the given index who can still play; -1 if none.
+    int NextPlayableAfter(int index)
     {
         if (_players.Count == 0) return -1;
-        
-        int nextIndex = (ActiveIndex + 1) % _players.Count;
-        
-        // Najdi dalšího hráče, který může hrát
+
+        int nextIndex = (index + 1) % _players.Count;
         int attempts = 0;
         while (attempts < _players.Count)
         {
-            if (_players[nextIndex].CanPlay)
-            {
-                return nextIndex;
-            }
+            if (_players[nextIndex].CanPlay) return nextIndex;
             nextIndex = (nextIndex + 1) % _players.Count;
             attempts++;
         }
-        
-        // Pokud žádný hráč nemůže hrát, vrať -1
         return -1;
     }
-    
-    /// Aktivuje dalšího hráče v pořadí
+
+    /// Aktivuje dalšího hráče v pořadí. Honours an Ace skip from the rule context.
     public void ActivateNextPlayer()
     {
-        int nextIndex = GetNextPlayerIndex();
+        int nextIndex = NextPlayableAfter(ActiveIndex);
+
+        if (Rules != null && Rules.SkipNextPlayer && nextIndex >= 0)
+        {
+            Rules.SkipNextPlayer = false;
+            nextIndex = NextPlayableAfter(nextIndex);
+        }
+
         if (nextIndex >= 0)
         {
             SetActiveIndex(nextIndex);

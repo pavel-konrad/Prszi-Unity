@@ -106,6 +106,9 @@ public class CardManager : MonoBehaviour
         if (deck == null) { Debug.LogError("[CardManager] Deck je null!"); return; }
         if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand je null!"); return; }
         
+        // Reset transient rule state so a Seven/Queen/Ace effect can't leak into a new hand.
+        GameSession.I.Rules?.ResetRoundState();
+
         // Vyčistit ruce a odhazovací balíček
         playerHand.Clear();
         discard.Clear();
@@ -216,7 +219,11 @@ public class CardManager : MonoBehaviour
         // Odehrát kartu
         player.RemoveCard(card);
         discard.AddCard(card);
-        
+
+        // Apply the card's rule effect to the shared context before advancing the turn:
+        // Seven → draw penalty, Ace → skip, Queen → forced suit, Regular → clears forced suit.
+        CardFactory.Create(card.suit, card.rank).OnPlay(GameSession.I.Rules, player);
+
         Debug.Log($"[CardManager] Hráč {player.Name} odehrál kartu: {card}");
         
         // Kontrola, zda hráč vyhrál
@@ -281,8 +288,26 @@ public class CardManager : MonoBehaviour
         return null;
     }
     
-    // Lízne kartu pro hráče
+    // Draws for a player, honouring an active Seven draw penalty: pulls
+    // PendingDrawCount cards (and clears it) when set, otherwise a single card.
     public Card DrawCardForPlayer(Player player)
+    {
+        int count = 1;
+        var rules = GameSession.I.Rules;
+        if (rules != null && rules.PendingDrawCount > 0)
+        {
+            count = rules.PendingDrawCount;
+            rules.ClearDrawPenalty();
+            Debug.Log($"[CardManager] Draw penalty active: {player.Name} draws {count} cards");
+        }
+
+        Card last = null;
+        for (int i = 0; i < count; i++) last = DrawOneForPlayer(player);
+        return last;
+    }
+
+    // Lízne jednu kartu pro hráče
+    Card DrawOneForPlayer(Player player)
     {
         Debug.Log($"[CardManager] DrawCardForPlayer voláno pro hráče: {player.Name}");
         Debug.Log($"[CardManager] Stav balíčku před líznutím: deck.cards.Count={deck?.cards?.Count ?? -1}");

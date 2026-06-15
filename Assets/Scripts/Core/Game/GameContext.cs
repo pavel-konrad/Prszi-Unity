@@ -141,5 +141,16 @@ namespace Prsi.Core.Game
         {
             PendingDrawCount = 0;
         }
+
+        /// <summary>
+        /// Clears all transient round state (forced suit, draw penalty, skip).
+        /// Call when a fresh hand is dealt so effects don't leak across rounds.
+        /// </summary>
+        public void ResetRoundState()
+        {
+            ForcedSuit = null;
+            PendingDrawCount = 0;
+            SkipNextPlayer = false;
+        }
     }
 }
