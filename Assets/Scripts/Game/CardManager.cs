@@ -249,14 +249,13 @@ public class CardManager : MonoBehaviour
         }
     }
     
-    // Zkontroluje, zda lze kartu zahrát
+    // Card playability is decided by the Prsi.Core rule engine (special cards included).
     public bool CanPlayCard(Card cardToPlay)
     {
         Card topCard = GetTopDiscardCard();
         if (topCard == null || cardToPlay == null) return false;
-        
-        // Stejná barva nebo stejná hodnota
-        return cardToPlay.suit == topCard.suit || cardToPlay.rank == topCard.rank;
+
+        return CardRules.CanPlay(cardToPlay, topCard, GameSession.I.Rules);
     }
     
     // Získá vrchní kartu z odhazovacího balíčku

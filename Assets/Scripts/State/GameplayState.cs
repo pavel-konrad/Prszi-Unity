@@ -142,13 +142,12 @@ public class GameplayState : IGameState
         return null;
     }
     
-    // Zkontroluje, zda lze kartu zahrát (stejná barva nebo hodnota)
+    // Card playability is decided by the Prsi.Core rule engine (special cards included).
     bool IsCardPlayable(Card cardToPlay, Card topCard)
     {
         if (cardToPlay == null || topCard == null) return false;
-        
-        // Stejná barva nebo stejná hodnota
-        return cardToPlay.suit == topCard.suit || cardToPlay.rank == topCard.rank;
+
+        return Prsi.Core.Cards.CardRules.CanPlay(cardToPlay, topCard, GameSession.I.Rules);
     }
     
     // Získá vrchní kartu z odhazovacího balíčku

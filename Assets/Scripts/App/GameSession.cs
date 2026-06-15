@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Prsi.Core;
+using Prsi.Core.Game;
 
 public class GameSession : MonoBehaviour
 {
@@ -27,7 +29,13 @@ public class GameSession : MonoBehaviour
     public int ActiveIndex { get; private set; } = -1;
 
     public int Pot { get; private set; } = 0;
-    
+
+    /// <summary>
+    /// Shared Prší rule state (forced suit, draw penalty, skip) owned by the session.
+    /// The running game moves physical cards/UI; Core owns the rules via this context.
+    /// </summary>
+    public GameContext Rules { get; private set; }
+
     public event Action<Player,int> ActivePlayerChanged;
     public event Action SessionChanged;
     public event Action<int> PotChanged;
@@ -51,7 +59,10 @@ public class GameSession : MonoBehaviour
         EnsurePlayers();
         ApplyHumanPrefsIfAny();
         RandomizeAI();
-        
+
+        // Build the shared rule context over the live players (Player : IPlayerData).
+        Rules = new GameContext(null, null, new List<IPlayerData>(_players));
+
         // Debug: zkontrolovat finální stav po všech inicializacích
         Debug.Log($"[GameSession] Po všech inicializacích: Human player (ID {Human.Id}, Name {Human.Name}) IsHuman: {Human.IsHuman}");
     }
