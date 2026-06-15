@@ -1,19 +1,29 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Prsi.Core.Cards;
 
 namespace Prsi.Core.Game
 {
     /// <summary>
-    /// Implementace balíčku karet
-    /// Ekvivalent JS deck.js z prszi projektu
-    /// 
-    /// Používá CardFactory pro vytváření karet správného typu
+    /// Implementace balíčku karet.
+    /// Používá CardFactory pro vytváření karet správného typu.
+    /// Míchání je deterministické přes injektovaný seed (System.Random) —
+    /// stejný seed = stejné pořadí → reprodukovatelné testy a předvídatelný běh.
+    /// Žádná závislost na UnityEngine → testovatelné v EditMode.
     /// </summary>
     public class Deck : ICardDeckProvider
     {
         private readonly List<BaseCard> cards = new List<BaseCard>();
-        
+        private readonly System.Random rng;
+
+        /// <summary>Balíček s náhodným seedem (běžná hra).</summary>
+        public Deck() : this(System.Environment.TickCount) { }
+
+        /// <summary>Balíček s daným seedem (reprodukovatelný — testy, replaye).</summary>
+        public Deck(int seed)
+        {
+            rng = new System.Random(seed);
+        }
+
         /// <summary>
         /// Počet zbývajících karet v balíčku
         /// </summary>
@@ -92,10 +102,8 @@ namespace Prsi.Core.Game
         {
             for (int i = cards.Count - 1; i > 0; i--)
             {
-                int j = Random.Range(0, i + 1);
-                var temp = cards[i];
-                cards[i] = cards[j];
-                cards[j] = temp;
+                int j = rng.Next(0, i + 1);
+                (cards[i], cards[j]) = (cards[j], cards[i]);
             }
         }
         
