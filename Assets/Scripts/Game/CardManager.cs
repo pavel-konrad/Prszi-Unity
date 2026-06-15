@@ -1,10 +1,18 @@
 using UnityEngine;
 using Prsi.Core.Cards;
+using Prsi.Core.Game;
 
 public class CardManager : MonoBehaviour
 {
+    // The draw deck is the Core Deck (seeded shuffle/draw/reshuffle, unit-tested).
+    // Discard and hands stay as scene CardStacks because the UI renders from them.
+    Deck deck;
+
+    [Header("Deck")]
+    [Tooltip("Shuffle seed; 0 = random each run. A fixed value makes the deal reproducible.")]
+    public int deckSeed = 0;
+
     [Header("Card Stacks")]
-    public CardStack deck;
     public CardStack discard;
     public CardStack playerHand;
     
@@ -25,7 +33,6 @@ public class CardManager : MonoBehaviour
     void Awake()
     {
         // Kontrola referencí
-        if (deck == null) Debug.LogError("[CardManager] Deck není přiřazen!");
         if (discard == null) Debug.LogError("[CardManager] Discard není přiřazen!");
         if (playerHand == null) Debug.LogError("[CardManager] PlayerHand není přiřazen!");
         
@@ -68,31 +75,19 @@ public class CardManager : MonoBehaviour
     
     void InitializeDeck()
     {
-        if (deck == null)
-        {
-            Debug.LogError("[CardManager] Deck je null, nemohu inicializovat!");
-            return;
-        }
-        
-        deck.Clear();
-        
-        // Vytvořit německý balíček 32 karet (7, 8, 9, 10, J, Q, K, A v každé barvě)
+        // Fixed seed = reproducible deal; 0 = random run.
+        deck = deckSeed != 0 ? new Deck(deckSeed) : new Deck();
+
+        // Build the 32-card mariáš deck of UI Cards and let Core shuffle it.
         foreach (Suit suit in System.Enum.GetValues(typeof(Suit)))
-        {
             foreach (Rank rank in System.Enum.GetValues(typeof(Rank)))
-            {
-                Card newCard = new Card(suit, rank);
-                deck.AddCard(newCard);
-            }
-        }
-        
+                deck.AddCard(new Card(suit, rank));
+
         deck.Shuffle();
     }
     
     public void DealCardsToPlayers()
     {
-        // Kontrola referencí
-        if (deck == null) { Debug.LogError("[CardManager] Deck je null!"); return; }
         if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand je null!"); return; }
         
         // Reset transient rule state so a Seven/Queen/Ace effect can't leak into a new hand.
@@ -123,7 +118,7 @@ public class CardManager : MonoBehaviour
             // Karta pro každého hráče (včetně human)
             for (int j = 0; j < GameSession.I.Players.Count; j++)
             {
-                Card card = deck.DrawCard();
+                Card card = deck.DrawCard() as Card;
                 if (card != null)
                 {
                     var player = GameSession.I.Players[j];
@@ -152,7 +147,7 @@ public class CardManager : MonoBehaviour
         }
         
         // Po rozdání karet otočit jednu kartu nahoru do odhazovacího balíčku
-        Card topCard = deck.DrawCard();
+        Card topCard = deck.DrawCard() as Card;
         if (topCard != null)
         {
             discard.AddCard(topCard);
@@ -334,15 +329,14 @@ public class CardManager : MonoBehaviour
     // Lízne jednu kartu pro hráče
     Card DrawOneForPlayer(Player player)
     {
-        
-        // Pokud je balíček prázdný, přehodit odhazovací balíček pozpátku
-        if (deck.cards.Count == 0)
+        // Když dojde balíček, doplnit ho z odhazovacího (kromě vrchní karty).
+        if (deck.IsEmpty)
         {
             ReshuffleDiscardIntoDeck();
         }
-        
-        Card drawnCard = deck.DrawCard();
-        
+
+        Card drawnCard = deck.DrawCard() as Card;
+
         if (drawnCard != null)
         {
             // Pro human hráče nejdřív přidat do UI s CardIn animací
@@ -395,7 +389,7 @@ public class CardManager : MonoBehaviour
         return drawnCard;
     }
     
-    // Přehodí odhazovací balíček zpět do balíčku pozpátku (kromě vrchní karty) - pravidla Prší
+    // Recycle the discard pile (minus its top card) back into the Core deck (S6.1).
     void ReshuffleDiscardIntoDeck()
     {
         if (discard.cards.Count <= 1)
@@ -403,20 +397,15 @@ public class CardManager : MonoBehaviour
             Debug.LogWarning("[CardManager] Nelze přehodit - odhazovací balíček má jen jednu nebo žádnou kartu");
             return;
         }
-        
-        // Ponechat vrchní kartu v discard
+
+        // Keep the top card in play, recycle the rest.
         Card topCard = discard.cards[discard.cards.Count - 1];
-        discard.cards.RemoveAt(discard.cards.Count - 1);
-        
-        // Přehodit zbytek do balíčku pozpátku (bez míchání)
-        for (int i = discard.cards.Count - 1; i >= 0; i--)
-        {
-            deck.AddCard(discard.cards[i]);
-        }
-        
+        var recycled = discard.cards.GetRange(0, discard.cards.Count - 1);
+
+        deck.ReshuffleFrom(recycled);
+
         discard.Clear();
         discard.AddCard(topCard);
-        
     }
     
     public void DiscardPlayerCard(Card card)
@@ -474,7 +463,7 @@ public class CardManager : MonoBehaviour
     // being lost or duplicated — log where so the leak can be traced.
     void AssertCardCount(string where)
     {
-        int total = (deck?.cards?.Count ?? 0) + (discard?.cards?.Count ?? 0)
+        int total = (deck?.RemainingCards ?? 0) + (discard?.cards?.Count ?? 0)
                   + (playerHand?.cards?.Count ?? 0);
         if (aiHands != null)
             foreach (var h in aiHands) total += h?.cards?.Count ?? 0;

@@ -150,66 +150,6 @@ public class GameplayState : IGameState
         return null;
     }
     
-    // Lízne kartu pro hráče
-    void DrawCardForPlayer(Player player)
-    {
-        if (cardManager.deck.cards.Count == 0)
-        {
-            Debug.LogWarning("[GameplayState] Balíček je prázdný! Přehazujeme odhazovací balíček pozpátku...");
-            ReshuffleDiscardIntoDeck();
-        }
-        
-        Card drawnCard = cardManager.deck.DrawCard();
-        if (drawnCard != null)
-        {
-            player.AddCard(drawnCard);
-            
-            // Pro human hráče také přidat do playerHand stacku pro UI
-            if (player.IsHuman)
-            {
-                cardManager.playerHand.AddCard(drawnCard);
-            }
-            // Pro AI hráče přidat do odpovídajícího AI hand stacku
-            else
-            {
-                int aiIndex = player.Id - 1; // AI hráči mají ID 1, 2, 3...
-                if (cardManager.aiHands != null && aiIndex >= 0 && aiIndex < cardManager.aiHands.Length && cardManager.aiHands[aiIndex] != null)
-                {
-                    cardManager.aiHands[aiIndex].AddCard(drawnCard);
-                }
-            }
-            
-        }
-        else
-        {
-            Debug.LogError("[GameplayState] Nelze líznout kartu - balíček je prázdný!");
-        }
-    }
-    
-    // Přehodí odhazovací balíček zpět do balíčku pozpátku (kromě vrchní karty) - pravidla Prší
-    void ReshuffleDiscardIntoDeck()
-    {
-        if (cardManager.discard.cards.Count <= 1)
-        {
-            Debug.LogWarning("[GameplayState] Nelze přehodit - odhazovací balíček má jen jednu nebo žádnou kartu");
-            return;
-        }
-        
-        // Ponechat vrchní kartu v discard
-        Card topCard = cardManager.discard.cards[cardManager.discard.cards.Count - 1];
-        cardManager.discard.cards.RemoveAt(cardManager.discard.cards.Count - 1);
-        
-        // Přehodit zbytek do balíčku pozpátku (bez míchání)
-        for (int i = cardManager.discard.cards.Count - 1; i >= 0; i--)
-        {
-            cardManager.deck.AddCard(cardManager.discard.cards[i]);
-        }
-        
-        cardManager.discard.Clear();
-        cardManager.discard.AddCard(topCard);
-        
-    }
-    
     // Volá se když se změní aktivní hráč
     void OnActivePlayerChanged(Player activePlayer, int activeIndex)
     {
@@ -234,22 +174,5 @@ public class GameplayState : IGameState
     {
         Card topCard = GetTopDiscardCard();
         return IsCardPlayable(cardToPlay, topCard);
-    }
-    
-    // Veřejná metoda pro líznutí karty (volá se z UI)
-    public void DrawCardForCurrentPlayer()
-    {
-        var activePlayer = GameSession.I.ActiveIndex >= 0 && GameSession.I.ActiveIndex < GameSession.I.Players.Count 
-            ? GameSession.I.Players[GameSession.I.ActiveIndex] 
-            : null;
-            
-        if (activePlayer != null && activePlayer.IsHuman)
-        {
-            DrawCardForPlayer(activePlayer);
-            
-            // Po líznutí předat tah dalšímu hráči
-            GameSession.I.ActivateNextPlayer();
-            // NEREKURZIVNĚ - OnActivePlayerChanged se postará o CheckActivePlayer()
-        }
     }
 }
