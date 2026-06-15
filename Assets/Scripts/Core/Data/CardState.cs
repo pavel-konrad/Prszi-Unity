@@ -21,9 +21,10 @@ namespace Prsi.Core
         }
         
         /// <summary>
-        /// Změní umístění karty (voláno z CardStateService)
+        /// Změní umístění karty (voláno z CardStateService).
+        /// Public kvůli hranici assembly — CardStateService žije mimo Prsi.Core.
         /// </summary>
-        internal void SetLocation(CardLocation newLocation, int? newOwnerId = null)
+        public void SetLocation(CardLocation newLocation, int? newOwnerId = null)
         {
             if (Location == newLocation && OwnerId == newOwnerId)
                 return;
