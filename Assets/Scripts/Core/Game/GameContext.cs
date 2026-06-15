@@ -50,6 +50,7 @@ namespace Prsi.Core.Game
         public event System.Action<ICardData, IPlayerData> OnCardPlayed;
         public event System.Action<ICardData, IPlayerData> OnCardDrawn;
         public event System.Action<Suit> OnSuitChanged;
+        public event System.Action OnForcedSuitCleared;
         public event System.Action<int> OnDrawPenalty;
         public event System.Action OnPlayerSkipped;
         
@@ -130,7 +131,9 @@ namespace Prsi.Core.Game
         /// </summary>
         public void ClearForcedSuit()
         {
+            if (ForcedSuit == null) return;
             ForcedSuit = null;
+            OnForcedSuitCleared?.Invoke();
         }
         
         /// <summary>
@@ -148,9 +151,9 @@ namespace Prsi.Core.Game
         /// </summary>
         public void ResetRoundState()
         {
-            ForcedSuit = null;
             PendingDrawCount = 0;
             SkipNextPlayer = false;
+            ClearForcedSuit();
         }
     }
 }

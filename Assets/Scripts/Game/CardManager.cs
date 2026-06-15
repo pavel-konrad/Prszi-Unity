@@ -220,22 +220,52 @@ public class CardManager : MonoBehaviour
         player.RemoveCard(card);
         discard.AddCard(card);
 
+        Debug.Log($"[CardManager] Hráč {player.Name} odehrál kartu: {card}");
+
         // Apply the card's rule effect to the shared context before advancing the turn:
         // Seven → draw penalty, Ace → skip, Queen → forced suit, Regular → clears forced suit.
-        CardFactory.Create(card.suit, card.rank).OnPlay(GameSession.I.Rules, player);
+        BaseCard domainCard = CardFactory.Create(card.suit, card.rank);
 
-        Debug.Log($"[CardManager] Hráč {player.Name} odehrál kartu: {card}");
-        
-        // Kontrola, zda hráč vyhrál
+        // A human Queen lets the player pick the forced suit via a modal; defer the
+        // turn until a suit is chosen. Everyone else (and AI Queens) resolve inline.
+        if (domainCard is QueenCard humanQueen && player.IsHuman && SuitSelectionModal.Instance != null)
+        {
+            SuitSelectionModal.Instance.Show(chosenSuit =>
+            {
+                humanQueen.SelectSuit(chosenSuit);
+                humanQueen.OnPlay(GameSession.I.Rules, player);
+                FinishPlay(player);
+            });
+            return;
+        }
+
+        if (domainCard is QueenCard aiQueen)
+            aiQueen.SelectSuit(ChooseAiSuit(player));
+
+        domainCard.OnPlay(GameSession.I.Rules, player);
+        FinishPlay(player);
+    }
+
+    // Win check + advance, shared by the inline and deferred (Queen modal) play paths.
+    void FinishPlay(Player player)
+    {
         if (player.HasWon)
-        {
             OnPlayerWon?.Invoke(player);
-        }
         else
-        {
-            // Aktivovat dalšího hráče v pořadí
             GameSession.I.ActivateNextPlayer();
-        }
+    }
+
+    // AI picks the suit it holds most of (falls back to Hearts on an empty hand).
+    Suit ChooseAiSuit(Player player)
+    {
+        var counts = new int[4];
+        foreach (Card c in player.hand) counts[(int)c.suit]++;
+
+        int best = 0;
+        for (int i = 1; i < counts.Length; i++)
+            if (counts[i] > counts[best]) best = i;
+
+        return (Suit)best;
     }
     
     // AI odehrá kartu (deprecated - nyní se používá GameplayState)
