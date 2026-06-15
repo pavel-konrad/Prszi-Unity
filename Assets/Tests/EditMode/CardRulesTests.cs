@@ -14,7 +14,7 @@ namespace Prsi.Tests.EditMode
     public class CardRulesTests
     {
         // Sdílený herní kontext bez balíčku/discardu — pravidla karet je nepotřebují.
-        private static GameContext Ctx() => new GameContext(null, null, new List<IPlayerData>());
+        private static GameContext Ctx() => new GameContext(new List<IPlayerData>());
 
         private static BaseCard Card(Suit s, Rank r) => CardFactory.Create(s, r);
 

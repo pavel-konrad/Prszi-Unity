@@ -31,7 +31,7 @@ namespace Prsi.Tests.EditMode
         {
             var players = new List<IPlayerData>();
             for (int i = 0; i < playerCount; i++) players.Add(new TestPlayer(i));
-            return new GameContext(null, null, players);
+            return new GameContext(players);
         }
 
         [Test] // S4.1 — normálně posun o 1

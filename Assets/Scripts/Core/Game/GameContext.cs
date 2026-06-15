@@ -4,15 +4,12 @@ using Prsi.Core.Cards;
 namespace Prsi.Core.Game
 {
     /// <summary>
-    /// Sdílený herní kontext - ekvivalent JS game objektu
-    /// Obsahuje stav hry, který karty a hráči potřebují pro své akce
+    /// Shared rule state for a round of Prší (forced suit, draw penalty, skip,
+    /// winner). The cards/UI live in the running game; this holds only what the
+    /// card rules and the turn loop need to reason about.
     /// </summary>
     public class GameContext
     {
-        // === Deck & Discard ===
-        public ICardDeckProvider Deck { get; }
-        public IDiscardPile DiscardPile { get; }
-        
         // === Players ===
         private readonly List<IPlayerData> players;
         public IReadOnlyList<IPlayerData> Players => players;
@@ -54,10 +51,8 @@ namespace Prsi.Core.Game
         public event System.Action<int> OnDrawPenalty;
         public event System.Action OnPlayerSkipped;
         
-        public GameContext(ICardDeckProvider deck, IDiscardPile discardPile, List<IPlayerData> players)
+        public GameContext(List<IPlayerData> players)
         {
-            Deck = deck;
-            DiscardPile = discardPile;
             this.players = players ?? new List<IPlayerData>();
             CurrentPlayerIndex = 0;
         }

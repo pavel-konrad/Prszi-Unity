@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Prsi.Core;
 using Prsi.Core.Cards;
 using Prsi.Core.Game;
 
@@ -66,6 +67,23 @@ namespace Prsi.Tests.EditMode
             var deck = new Deck(1); // prázdný (bez Initialize)
             Assert.IsTrue(deck.IsEmpty);
             Assert.IsNull(deck.DrawCard());
+        }
+
+        [Test] // S6.1 — vyčerpaný balíček se doplní z odhazovacího (reshuffle)
+        public void ReshuffleFrom_RecyclesCardsBackIntoDeck()
+        {
+            var deck = new Deck(1); // prázdný
+            var recycled = new ICardData[]
+            {
+                CardFactory.Create(Suit.Hearts, Rank.Eight),
+                CardFactory.Create(Suit.Spades, Rank.Nine),
+                CardFactory.Create(Suit.Clubs, Rank.Ten),
+            };
+
+            deck.ReshuffleFrom(recycled);
+
+            Assert.AreEqual(3, deck.RemainingCards);
+            Assert.IsNotNull(deck.DrawCard());
         }
     }
 }

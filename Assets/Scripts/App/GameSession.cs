@@ -61,7 +61,7 @@ public class GameSession : MonoBehaviour
         RandomizeAI();
 
         // Build the shared rule context over the live players (Player : IPlayerData).
-        Rules = new GameContext(null, null, new List<IPlayerData>(_players));
+        Rules = new GameContext(new List<IPlayerData>(_players));
 
     }
 

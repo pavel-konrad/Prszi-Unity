@@ -20,7 +20,7 @@ namespace Prsi.Tests.EditMode
             public Rank Rank { get; }
         }
 
-        private static GameContext Ctx() => new GameContext(null, null, new List<IPlayerData>());
+        private static GameContext Ctx() => new GameContext(new List<IPlayerData>());
 
         [Test] // S2.1 via bridge — same suit playable
         public void Bridge_RegularSameSuit_IsPlayable()
