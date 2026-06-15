@@ -1,6 +1,7 @@
 using UnityEngine;
 using Prsi.Data;
 using Prsi.Core;
+using Prsi.Core.Cards;
 
 namespace Prsi.Core.Services
 {
@@ -24,7 +25,7 @@ namespace Prsi.Core.Services
             }
         }
         
-        public Sprite GetCardSprite(Card.Suit suit, Card.Rank rank)
+        public Sprite GetCardSprite(Suit suit, Rank rank)
         {
             if (currentTheme == null)
             {

@@ -19,7 +19,7 @@ namespace Prsi.Core.Cards
         
         public override bool IsSpecial => true;
         
-        public SevenCard(Card.Suit suit, Card.Rank rank) : base(suit, rank)
+        public SevenCard(Suit suit, Rank rank) : base(suit, rank)
         {
         }
         
@@ -34,7 +34,7 @@ namespace Prsi.Core.Cards
             if (context?.PendingDrawCount > 0)
             {
                 // Obrana sedmou - lze zahrát na sedmu
-                return topCard?.Rank == Card.Rank.Seven;
+                return topCard?.Rank == Rank.Seven;
             }
             
             // Pokud je vynucená barva (po dámě), musí souhlasit barva

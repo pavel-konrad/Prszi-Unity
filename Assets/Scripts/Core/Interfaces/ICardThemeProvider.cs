@@ -1,5 +1,6 @@
 using UnityEngine;
 using Prsi.Data;
+using Prsi.Core.Cards;
 
 namespace Prsi.Core
 {
@@ -16,7 +17,7 @@ namespace Prsi.Core
         /// <summary>
         /// Získá sprite pro kartu podle barvy a hodnoty
         /// </summary>
-        Sprite GetCardSprite(Card.Suit suit, Card.Rank rank);
+        Sprite GetCardSprite(Suit suit, Rank rank);
         
         /// <summary>
         /// Získá sprite pro rubovou stranu karty

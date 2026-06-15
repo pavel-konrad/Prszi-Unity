@@ -1,4 +1,5 @@
 using UnityEngine;
+using Prsi.Core.Cards;
 
 public class CardManager : MonoBehaviour
 {
@@ -87,9 +88,9 @@ public class CardManager : MonoBehaviour
         deck.Clear();
         
         // Vytvořit německý balíček 32 karet (7, 8, 9, 10, J, Q, K, A v každé barvě)
-        foreach (Card.Suit suit in System.Enum.GetValues(typeof(Card.Suit)))
+        foreach (Suit suit in System.Enum.GetValues(typeof(Suit)))
         {
-            foreach (Card.Rank rank in System.Enum.GetValues(typeof(Card.Rank)))
+            foreach (Rank rank in System.Enum.GetValues(typeof(Rank)))
             {
                 Card newCard = new Card(suit, rank);
                 deck.AddCard(newCard);

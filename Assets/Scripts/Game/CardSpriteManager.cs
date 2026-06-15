@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Prsi.Core.Cards;
 
 public class CardSpriteManager : MonoBehaviour
 {
@@ -62,10 +63,10 @@ public class CardSpriteManager : MonoBehaviour
         Debug.Log("[CardSpriteManager] Inicializace sprite cache...");
         
         // Načíst sprites pro každou barvu
-        LoadSpritesForSuit(Card.Suit.Hearts, heartSprites);
-        LoadSpritesForSuit(Card.Suit.Diamonds, diamondSprites);
-        LoadSpritesForSuit(Card.Suit.Clubs, clubSprites);
-        LoadSpritesForSuit(Card.Suit.Spades, spadeSprites);
+        LoadSpritesForSuit(Suit.Hearts, heartSprites);
+        LoadSpritesForSuit(Suit.Diamonds, diamondSprites);
+        LoadSpritesForSuit(Suit.Clubs, clubSprites);
+        LoadSpritesForSuit(Suit.Spades, spadeSprites);
         
         // Pokud nemáme žádné sprites, zkusit flexibilní načítání
         if (spriteCache.Count == 0)
@@ -90,7 +91,7 @@ public class CardSpriteManager : MonoBehaviour
         }
     }
     
-    void LoadSpritesForSuit(Card.Suit suit, Sprite[] sprites)
+    void LoadSpritesForSuit(Suit suit, Sprite[] sprites)
     {
         Debug.Log($"[CardSpriteManager] Načítání sprites pro {suit}. Počet sprites: {(sprites != null ? sprites.Length : 0)}");
         
@@ -100,8 +101,8 @@ public class CardSpriteManager : MonoBehaviour
             return;
         }
         
-        Card.Rank[] ranks = { Card.Rank.Seven, Card.Rank.Eight, Card.Rank.Nine, Card.Rank.Ten, 
-                             Card.Rank.Jack, Card.Rank.Queen, Card.Rank.King, Card.Rank.Ace };
+        Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
+                             Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
         
         for (int i = 0; i < ranks.Length && i < sprites.Length; i++)
         {
@@ -111,12 +112,12 @@ public class CardSpriteManager : MonoBehaviour
         }
     }
     
-    string GetSpriteKey(Card.Suit suit, Card.Rank rank)
+    string GetSpriteKey(Suit suit, Rank rank)
     {
         return $"{suit}_{rank}";
     }
     
-    public Sprite GetCardSprite(Card.Suit suit, Card.Rank rank)
+    public Sprite GetCardSprite(Suit suit, Rank rank)
     {
         string key = GetSpriteKey(suit, rank);
         Debug.Log($"[CardSpriteManager] Hledám sprite pro klíč: {key}");
@@ -160,7 +161,7 @@ public class CardSpriteManager : MonoBehaviour
     }
     
     // Vytvoří sprite karty z jednotlivých symbolů
-    public Sprite CreateCardSpriteFromSymbols(Card.Suit suit, Card.Rank rank)
+    public Sprite CreateCardSpriteFromSymbols(Suit suit, Rank rank)
     {
         if (symbolSprites == null || symbolSprites.Length == 0)
         {
@@ -189,30 +190,30 @@ public class CardSpriteManager : MonoBehaviour
         return symbolSprites[rankIndex];
     }
     
-    int GetRankIndex(Card.Rank rank)
+    int GetRankIndex(Rank rank)
     {
         switch (rank)
         {
-            case Card.Rank.Seven: return 0;
-            case Card.Rank.Eight: return 1;
-            case Card.Rank.Nine: return 2;
-            case Card.Rank.Ten: return 3;
-            case Card.Rank.Jack: return 4;
-            case Card.Rank.Queen: return 5;
-            case Card.Rank.King: return 6;
-            case Card.Rank.Ace: return 7;
+            case Rank.Seven: return 0;
+            case Rank.Eight: return 1;
+            case Rank.Nine: return 2;
+            case Rank.Ten: return 3;
+            case Rank.Jack: return 4;
+            case Rank.Queen: return 5;
+            case Rank.King: return 6;
+            case Rank.Ace: return 7;
             default: return -1;
         }
     }
     
-    Sprite GetSuitSymbol(Card.Suit suit)
+    Sprite GetSuitSymbol(Suit suit)
     {
         switch (suit)
         {
-            case Card.Suit.Hearts: return heartSymbol;
-            case Card.Suit.Diamonds: return diamondSymbol;
-            case Card.Suit.Clubs: return clubSymbol;
-            case Card.Suit.Spades: return spadeSymbol;
+            case Suit.Hearts: return heartSymbol;
+            case Suit.Diamonds: return diamondSymbol;
+            case Suit.Clubs: return clubSymbol;
+            case Suit.Spades: return spadeSymbol;
             default: return null;
         }
     }
@@ -224,9 +225,9 @@ public class CardSpriteManager : MonoBehaviour
         Debug.Log("[CardSpriteManager] Začínám načítat sprites z Resources...");
         
         // Příklad struktury: Resources/Cards/Hearts/7.png, Resources/Cards/Hearts/8.png, atd.
-        Card.Suit[] suits = { Card.Suit.Hearts, Card.Suit.Diamonds, Card.Suit.Clubs, Card.Suit.Spades };
-        Card.Rank[] ranks = { Card.Rank.Seven, Card.Rank.Eight, Card.Rank.Nine, Card.Rank.Ten, 
-                             Card.Rank.Jack, Card.Rank.Queen, Card.Rank.King, Card.Rank.Ace };
+        Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
+        Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
+                             Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
         
         int loadedCount = 0;
         
@@ -257,7 +258,7 @@ public class CardSpriteManager : MonoBehaviour
     }
 
     // Fallback systém pro vytvoření jednoduchých spriteů
-    public Sprite CreateFallbackSprite(Card.Suit suit, Card.Rank rank)
+    public Sprite CreateFallbackSprite(Suit suit, Rank rank)
     {
         Debug.Log($"[CardSpriteManager] Vytvářím fallback sprite pro {rank} of {suit}");
         
@@ -273,12 +274,12 @@ public class CardSpriteManager : MonoBehaviour
         // Barva pro různé barvy karet
         switch (suit)
         {
-            case Card.Suit.Hearts:
-            case Card.Suit.Diamonds:
+            case Suit.Hearts:
+            case Suit.Diamonds:
                 textColor = Color.red;
                 break;
-            case Card.Suit.Clubs:
-            case Card.Suit.Spades:
+            case Suit.Clubs:
+            case Suit.Spades:
                 textColor = Color.black;
                 break;
         }
@@ -308,9 +309,9 @@ public class CardSpriteManager : MonoBehaviour
     {
         Debug.Log("[CardSpriteManager] Vytvářím všechny fallback sprites...");
         
-        Card.Suit[] suits = { Card.Suit.Hearts, Card.Suit.Diamonds, Card.Suit.Clubs, Card.Suit.Spades };
-        Card.Rank[] ranks = { Card.Rank.Seven, Card.Rank.Eight, Card.Rank.Nine, Card.Rank.Ten, 
-                             Card.Rank.Jack, Card.Rank.Queen, Card.Rank.King, Card.Rank.Ace };
+        Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
+        Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
+                             Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
         
         foreach (var suit in suits)
         {
@@ -373,7 +374,7 @@ public class CardSpriteManager : MonoBehaviour
         }
         
         // Zkontrolovat strukturu složek
-        Card.Suit[] suits = { Card.Suit.Hearts, Card.Suit.Diamonds, Card.Suit.Clubs, Card.Suit.Spades };
+        Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
         foreach (var suit in suits)
         {
             Sprite[] suitSprites = Resources.LoadAll<Sprite>($"Cards/{suit}");
@@ -409,9 +410,9 @@ public class CardSpriteManager : MonoBehaviour
             Debug.Log($"[CardSpriteManager] Dostupné sprite: {sprite.name}");
         }
         
-        Card.Suit[] suits = { Card.Suit.Hearts, Card.Suit.Diamonds, Card.Suit.Clubs, Card.Suit.Spades };
-        Card.Rank[] ranks = { Card.Rank.Seven, Card.Rank.Eight, Card.Rank.Nine, Card.Rank.Ten, 
-                             Card.Rank.Jack, Card.Rank.Queen, Card.Rank.King, Card.Rank.Ace };
+        Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
+        Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
+                             Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
         
         int loadedCount = 0;
         
@@ -481,7 +482,7 @@ public class CardSpriteManager : MonoBehaviour
     }
     
     // Najít sprite podle jména
-    Sprite FindSpriteByName(Card.Suit suit, Card.Rank rank)
+    Sprite FindSpriteByName(Suit suit, Rank rank)
     {
         // Načíst všechny sprites z Resources
         Sprite[] allSprites = Resources.LoadAll<Sprite>("");
@@ -523,18 +524,18 @@ public class CardSpriteManager : MonoBehaviour
     }
     
     // Převést rank na krátký název (7, 8, 9, 10, J, Q, K, A)
-    string GetRankShortName(Card.Rank rank)
+    string GetRankShortName(Rank rank)
     {
         switch (rank)
         {
-            case Card.Rank.Seven: return "7";
-            case Card.Rank.Eight: return "8";
-            case Card.Rank.Nine: return "9";
-            case Card.Rank.Ten: return "10";
-            case Card.Rank.Jack: return "J";
-            case Card.Rank.Queen: return "Q";
-            case Card.Rank.King: return "K";
-            case Card.Rank.Ace: return "A";
+            case Rank.Seven: return "7";
+            case Rank.Eight: return "8";
+            case Rank.Nine: return "9";
+            case Rank.Ten: return "10";
+            case Rank.Jack: return "J";
+            case Rank.Queen: return "Q";
+            case Rank.King: return "K";
+            case Rank.Ace: return "A";
             default: return rank.ToString();
         }
     }
@@ -545,9 +546,9 @@ public class CardSpriteManager : MonoBehaviour
     {
         Debug.Log("=== Test Formátu Názvů ===");
         
-        Card.Suit[] suits = { Card.Suit.Hearts, Card.Suit.Diamonds, Card.Suit.Clubs, Card.Suit.Spades };
-        Card.Rank[] ranks = { Card.Rank.Seven, Card.Rank.Eight, Card.Rank.Nine, Card.Rank.Ten, 
-                             Card.Rank.Jack, Card.Rank.Queen, Card.Rank.King, Card.Rank.Ace };
+        Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
+        Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
+                             Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
         
         Debug.Log("Očekávané názvy pro váš formát:");
         foreach (var suit in suits)

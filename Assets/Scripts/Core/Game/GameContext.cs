@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Prsi.Core.Cards;
 
 namespace Prsi.Core.Game
 {
@@ -38,7 +39,7 @@ namespace Prsi.Core.Game
         /// Vynucená barva (efekt dámy)
         /// Null = žádná vynucená barva
         /// </summary>
-        public Card.Suit? ForcedSuit { get; set; }
+        public Suit? ForcedSuit { get; set; }
         
         // === Game State ===
         public bool IsGameOver { get; set; }
@@ -48,7 +49,7 @@ namespace Prsi.Core.Game
         public event System.Action<IPlayerData> OnPlayerWon;
         public event System.Action<ICardData, IPlayerData> OnCardPlayed;
         public event System.Action<ICardData, IPlayerData> OnCardDrawn;
-        public event System.Action<Card.Suit> OnSuitChanged;
+        public event System.Action<Suit> OnSuitChanged;
         public event System.Action<int> OnDrawPenalty;
         public event System.Action OnPlayerSkipped;
         
@@ -82,7 +83,7 @@ namespace Prsi.Core.Game
         /// <summary>
         /// Vyvolá událost změny barvy
         /// </summary>
-        public void NotifySuitChanged(Card.Suit suit)
+        public void NotifySuitChanged(Suit suit)
         {
             ForcedSuit = suit;
             OnSuitChanged?.Invoke(suit);

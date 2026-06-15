@@ -20,13 +20,13 @@ namespace Prsi.Core.Cards
         /// <param name="suit">Barva karty</param>
         /// <param name="rank">Hodnota karty</param>
         /// <returns>Instance správného typu karty</returns>
-        public static BaseCard Create(Card.Suit suit, Card.Rank rank)
+        public static BaseCard Create(Suit suit, Rank rank)
         {
             return rank switch
             {
-                Card.Rank.Seven => new SevenCard(suit, rank),
-                Card.Rank.Ace => new AceCard(suit, rank),
-                Card.Rank.Queen => new QueenCard(suit, rank),
+                Rank.Seven => new SevenCard(suit, rank),
+                Rank.Ace => new AceCard(suit, rank),
+                Rank.Queen => new QueenCard(suit, rank),
                 _ => new RegularCard(suit, rank)
             };
         }
@@ -39,9 +39,9 @@ namespace Prsi.Core.Cards
         {
             var deck = new List<BaseCard>(32);
             
-            foreach (Card.Suit suit in System.Enum.GetValues(typeof(Card.Suit)))
+            foreach (Suit suit in System.Enum.GetValues(typeof(Suit)))
             {
-                foreach (Card.Rank rank in System.Enum.GetValues(typeof(Card.Rank)))
+                foreach (Rank rank in System.Enum.GetValues(typeof(Rank)))
                 {
                     deck.Add(Create(suit, rank));
                 }
@@ -57,7 +57,7 @@ namespace Prsi.Core.Cards
         /// <param name="suits">Seznam barev</param>
         /// <param name="ranks">Seznam hodnot</param>
         /// <returns>Seznam karet</returns>
-        public static List<BaseCard> CreateDeck(IEnumerable<Card.Suit> suits, IEnumerable<Card.Rank> ranks)
+        public static List<BaseCard> CreateDeck(IEnumerable<Suit> suits, IEnumerable<Rank> ranks)
         {
             var deck = new List<BaseCard>();
             
@@ -75,11 +75,11 @@ namespace Prsi.Core.Cards
         /// <summary>
         /// Zkontroluje, zda je karta speciální (sedma, eso, dáma)
         /// </summary>
-        public static bool IsSpecialRank(Card.Rank rank)
+        public static bool IsSpecialRank(Rank rank)
         {
-            return rank == Card.Rank.Seven 
-                || rank == Card.Rank.Ace 
-                || rank == Card.Rank.Queen;
+            return rank == Rank.Seven 
+                || rank == Rank.Ace 
+                || rank == Rank.Queen;
         }
     }
 }

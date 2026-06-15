@@ -1,4 +1,5 @@
 using UnityEngine;
+using Prsi.Core.Cards;
 
 namespace Prsi.Core
 {
@@ -7,8 +8,8 @@ namespace Prsi.Core
     /// </summary>
     public interface ICardData
     {
-        Card.Suit Suit { get; }
-        Card.Rank Rank { get; }
+        Suit Suit { get; }
+        Rank Rank { get; }
     }
 }
 

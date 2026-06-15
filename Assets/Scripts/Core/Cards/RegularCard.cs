@@ -15,7 +15,7 @@ namespace Prsi.Core.Cards
     {
         public override bool IsSpecial => false;
         
-        public RegularCard(Card.Suit suit, Card.Rank rank) : base(suit, rank)
+        public RegularCard(Suit suit, Rank rank) : base(suit, rank)
         {
         }
         

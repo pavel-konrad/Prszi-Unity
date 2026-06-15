@@ -17,9 +17,9 @@ namespace Prsi.Core.Cards
         /// Vybraná barva po zahrání dámy
         /// Nastavuje se před voláním OnPlay()
         /// </summary>
-        public Card.Suit? SelectedSuit { get; set; }
+        public Suit? SelectedSuit { get; set; }
         
-        public QueenCard(Card.Suit suit, Card.Rank rank) : base(suit, rank)
+        public QueenCard(Suit suit, Rank rank) : base(suit, rank)
         {
         }
         
@@ -50,7 +50,7 @@ namespace Prsi.Core.Cards
         public override void OnPlay(GameContext context, IPlayerData player)
         {
             // Určit novou barvu - buď vybranou, nebo barvu dámy
-            Card.Suit newSuit = SelectedSuit ?? Suit;
+            Suit newSuit = SelectedSuit ?? Suit;
             
             // Nastavit vynucenou barvu
             context?.NotifySuitChanged(newSuit);
@@ -66,7 +66,7 @@ namespace Prsi.Core.Cards
         /// Nastaví vybranou barvu před zahráním
         /// Volá se z UI před OnPlay()
         /// </summary>
-        public void SelectSuit(Card.Suit suit)
+        public void SelectSuit(Suit suit)
         {
             SelectedSuit = suit;
         }

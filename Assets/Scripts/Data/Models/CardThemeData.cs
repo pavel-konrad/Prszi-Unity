@@ -1,4 +1,5 @@
 using UnityEngine;
+using Prsi.Core.Cards;
 
 namespace Prsi.Data
 {
@@ -35,7 +36,7 @@ namespace Prsi.Data
         /// <summary>
         /// Získá sprite pro kartu podle barvy a hodnoty
         /// </summary>
-        public Sprite GetCardSprite(Card.Suit suit, Card.Rank rank)
+        public Sprite GetCardSprite(Suit suit, Rank rank)
         {
             int suitIndex = (int)suit; // 0=Hearts, 1=Diamonds, 2=Clubs, 3=Spades
             int rankIndex = GetRankIndex(rank);
@@ -52,18 +53,18 @@ namespace Prsi.Data
             return null;
         }
         
-        private int GetRankIndex(Card.Rank rank)
+        private int GetRankIndex(Rank rank)
         {
             switch (rank)
             {
-                case Card.Rank.Seven: return 0;
-                case Card.Rank.Eight: return 1;
-                case Card.Rank.Nine: return 2;
-                case Card.Rank.Ten: return 3;
-                case Card.Rank.Jack: return 4;
-                case Card.Rank.Queen: return 5;
-                case Card.Rank.King: return 6;
-                case Card.Rank.Ace: return 7;
+                case Rank.Seven: return 0;
+                case Rank.Eight: return 1;
+                case Rank.Nine: return 2;
+                case Rank.Ten: return 3;
+                case Rank.Jack: return 4;
+                case Rank.Queen: return 5;
+                case Rank.King: return 6;
+                case Rank.Ace: return 7;
                 default: return -1;
             }
         }

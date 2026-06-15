@@ -1,11 +1,9 @@
 using UnityEngine;
+using Prsi.Core.Cards;
 
 [System.Serializable]
 public class Card
 {
-    public enum Suit { Hearts, Diamonds, Clubs, Spades }
-    public enum Rank { Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 }
-    
     public Suit suit;
     public Rank rank;
     public Sprite cardSprite;

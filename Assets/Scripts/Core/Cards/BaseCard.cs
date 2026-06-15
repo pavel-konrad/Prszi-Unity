@@ -12,8 +12,8 @@ namespace Prsi.Core.Cards
     /// </summary>
     public abstract class BaseCard : ICardData
     {
-        public Card.Suit Suit { get; }
-        public Card.Rank Rank { get; }
+        public Suit Suit { get; }
+        public Rank Rank { get; }
         
         /// <summary>
         /// Zda je karta speciální (má zvláštní efekt)
@@ -21,7 +21,7 @@ namespace Prsi.Core.Cards
         /// </summary>
         public virtual bool IsSpecial => false;
         
-        protected BaseCard(Card.Suit suit, Card.Rank rank)
+        protected BaseCard(Suit suit, Rank rank)
         {
             Suit = suit;
             Rank = rank;
