@@ -105,6 +105,7 @@ public class GameplayState : IGameState
     // Eso efekt: přeskočený hráč krátce „stojí" (hláška v UI), pak se předá tah dál.
     IEnumerator SkipTurn(Player player)
     {
+        GameLog.Record("STAND", player.Name);
         PlayerEffectDisplay.Instance?.ShowSkip(player);
         yield return new WaitForSeconds(1.2f);
         PlayerEffectDisplay.Instance?.Hide(player);

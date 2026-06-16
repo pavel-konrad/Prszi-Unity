@@ -85,6 +85,7 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
     // Human „stojí" na eso: krátká hláška v jeho baru, pak předá tah.
     System.Collections.IEnumerator StandThenPass(Player human)
     {
+        GameLog.Record("STAND", human.Name);
         PlayerEffectDisplay.Instance?.ShowSkip(human);
         yield return new WaitForSeconds(1.0f);
         PlayerEffectDisplay.Instance?.Hide(human);

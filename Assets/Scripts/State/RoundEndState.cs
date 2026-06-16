@@ -24,6 +24,9 @@ public class RoundEndState : IGameState
         // Round winner = the player who emptied their hand.
         Player winner = players.Find(p => p.HasWon);
 
+        GameLog.Record("ROUND_END", winner != null ? winner.Name : "?");
+        GameLog.Flush();
+
         // Pay penalties (losers pay card value × rate; winner collects).
         var tournamentPlayers = new List<ITournamentPlayer>(players);
         TournamentRules.SettleRound(tournamentPlayers, winner, gs.penaltyRate);

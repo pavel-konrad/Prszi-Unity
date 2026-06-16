@@ -32,6 +32,8 @@ public class CardManager : MonoBehaviour
     
     void Awake()
     {
+        GameLog.Cards = this;
+
         // Kontrola referencí
         if (discard == null) Debug.LogError("[CardManager] Discard není přiřazen!");
         if (playerHand == null) Debug.LogError("[CardManager] PlayerHand není přiřazen!");
@@ -87,6 +89,8 @@ public class CardManager : MonoBehaviour
     public void DealCardsToPlayers()
     {
         if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand je null!"); return; }
+
+        GameLog.Clear();
 
         // Build a fresh 32-card deck for the new hand. Done here (not in Awake) so a
         // new round without a scene reload starts full, and so CardSpriteManager has
@@ -160,6 +164,7 @@ public class CardManager : MonoBehaviour
             Debug.LogError("[CardManager] Chyba: nemohu otočit kartu nahoru - balíček je prázdný!");
         }
 
+        GameLog.Record("DEAL", "", topCard != null ? topCard.ToString() : "");
 #if UNITY_EDITOR
         AssertCardCount("deal");
 #endif
@@ -210,6 +215,8 @@ public class CardManager : MonoBehaviour
         player.RemoveCard(card);
         discard.AddCard(card);
 
+
+        GameLog.Record("PLAY", player.Name, card.ToString());
 
         // Apply the card's rule effect to the shared context before advancing the turn:
         // Seven → draw penalty, Ace → skip, Queen → forced suit, Regular → clears forced suit.
@@ -341,6 +348,7 @@ public class CardManager : MonoBehaviour
         }
 
         Card drawnCard = deck.DrawCard() as Card;
+        GameLog.Record("DRAW", player.Name, drawnCard != null ? drawnCard.ToString() : "(none)");
 
         if (drawnCard != null)
         {

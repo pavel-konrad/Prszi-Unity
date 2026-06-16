@@ -151,6 +151,7 @@ public class GameSession : MonoBehaviour
         }
 
         var active = (ActiveIndex >= 0 && ActiveIndex < _players.Count) ? _players[ActiveIndex] : null;
+        if (active != null) GameLog.Record("ACTIVE", active.Name);
         ActivePlayerChanged?.Invoke(active, ActiveIndex);
     }
     
