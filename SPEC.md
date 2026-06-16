@@ -56,6 +56,19 @@ Speciální: **7** (lízni +2, kumulativně), **eso** (přeskoč), **dáma** (na
 
 ---
 
+## T — Eliminační turnaj (TournamentRules) [EditMode]
+
+- **T1.1** Penalta prázdné ruky = 0.
+- **T1.2** Penalta {eso, sedma} při sazbě 10 = 210 (hodnota × sazba).
+- **T2.1** Poražený zaplatí přesně svou penaltu (cash klesne o ni).
+- **T2.2** Vítěz dostane součet zaplacených penalt.
+- **T2.3** Poražený bez dostatku cash zaplatí jen `Cash` (→0), vítěz dostane jen reálně zaplacené.
+- **T3.1** `IsEliminated` = `Cash == 0`.
+- **T3.2** `OverallWinner` vrací hráče, právě když jeden má `Cash > 0`; jinak null.
+- **T3.3** Eliminovaný se nepočítá do `RemainingPlayers`.
+
+Detaily ekonomiky: `TOURNAMENT.md`. Vše pokryto (`TournamentRulesTests`, 8 testů zelených).
+
 ## Pokrytí (stav)
 
 **Pokryto EditMode testy (23 testů, zelené):**
