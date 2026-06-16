@@ -70,21 +70,33 @@ namespace Prsi.Tests.EditMode
             Assert.IsFalse(Card(Suit.Hearts, Rank.Eight).CanPlayOn(topSeven, ctx), "běžná ne");
         }
 
-        [Test] // S3.3 — eso nastaví přeskočení
-        public void Ace_OnPlay_SetsSkipNextPlayer()
+        [Test] // S3.3 — eso nastaví AcePending (další musí přebít nebo stát)
+        public void Ace_OnPlay_SetsAcePending()
         {
             var ctx = Ctx();
             Card(Suit.Spades, Rank.Ace).OnPlay(ctx, null);
-            Assert.IsTrue(ctx.SkipNextPlayer);
+            Assert.IsTrue(ctx.AcePending);
         }
 
-        [Test] // S3.3 — eso nelze hrát při penalizaci
+        [Test] // S3.3 — eso nelze hrát při penalizaci (sedma)
         public void Ace_DuringPenalty_NotPlayable()
         {
             var ctx = Ctx();
             ctx.NotifyDrawPenalty(2);
             var top = Card(Suit.Spades, Rank.Seven);
             Assert.IsFalse(Card(Suit.Spades, Rank.Ace).CanPlayOn(top, ctx));
+        }
+
+        [Test] // S3.9 — na čekající eso lze přebít jen esem (ostatní karty ne)
+        public void AcePending_OnlyAce_CanRespond()
+        {
+            var ctx = Ctx();
+            ctx.AcePending = true;
+            var top = Card(Suit.Spades, Rank.Ace);
+            Assert.IsTrue(Card(Suit.Hearts, Rank.Ace).CanPlayOn(top, ctx), "eso přebije eso");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Eight).CanPlayOn(top, ctx), "běžná ne");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Seven).CanPlayOn(top, ctx), "sedma ne");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Queen).CanPlayOn(top, ctx), "dáma ne");
         }
 
         [Test] // S3.4 — dáma na cokoliv

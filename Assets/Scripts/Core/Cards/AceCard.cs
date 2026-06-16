@@ -24,36 +24,42 @@ namespace Prsi.Core.Cards
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
-            // Pokud je aktivní penalizace líznutí, nelze zahrát eso
+            // Obrana proti esu: na čekající eso lze přebít vlastním esem.
+            if (context?.AcePending == true)
+            {
+                return true; // tahle karta je eso
+            }
+
+            // Pokud je aktivní penalizace líznutí (sedma), nelze zahrát eso
             if (context?.PendingDrawCount > 0)
             {
                 return false;
             }
-            
+
             // Pokud je vynucená barva (po dámě), musí souhlasit barva
             if (context?.ForcedSuit != null)
             {
                 return Suit == context.ForcedSuit.Value;
             }
-            
+
             // Standardní pravidlo: stejná barva nebo hodnota
             return MatchesSuitOrRank(topCard);
         }
-        
+
         /// <summary>
-        /// Efekt esa: přeskočí dalšího hráče
+        /// Efekt esa: další hráč musí přebít esem, nebo stojí (přeskočí, nelíže).
         /// </summary>
         public override void OnPlay(GameContext context, IPlayerData player)
         {
             // Zrušit vynucenou barvu
             context?.ClearForcedSuit();
-            
-            // Nastavit přeskočení dalšího hráče
+
+            // Eso čeká na reakci dalšího hráče
             if (context != null)
             {
-                context.SkipNextPlayer = true;
+                context.AcePending = true;
             }
-            
+
             // Notifikovat o zahrání karty
             context?.NotifyCardPlayed(this, player);
         }

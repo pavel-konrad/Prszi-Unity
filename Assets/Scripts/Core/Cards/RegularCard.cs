@@ -27,18 +27,24 @@ namespace Prsi.Core.Cards
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
+            // Na čekající eso lze reagovat jen esem.
+            if (context?.AcePending == true)
+            {
+                return false;
+            }
+
             // Pokud je aktivní penalizace líznutí, nelze zahrát běžnou kartu
             if (context?.PendingDrawCount > 0)
             {
                 return false;
             }
-            
+
             // Pokud je vynucená barva (po dámě), musí souhlasit barva
             if (context?.ForcedSuit != null)
             {
                 return Suit == context.ForcedSuit.Value;
             }
-            
+
             // Standardní pravidlo: stejná barva nebo hodnota
             return MatchesSuitOrRank(topCard);
         }

@@ -43,32 +43,6 @@ namespace Prsi.Tests.EditMode
             Assert.AreEqual(1, ctx.CurrentPlayerIndex);
         }
 
-        [Test] // S4.2 — skip posune o 2, vynuluje flag a vystřelí událost
-        public void Advance_WithSkip_MovesByTwoAndFiresEvent()
-        {
-            var ctx = CtxWith(4);
-            ctx.CurrentPlayerIndex = 0;
-            ctx.SkipNextPlayer = true;
-            bool skipped = false;
-            ctx.OnPlayerSkipped += () => skipped = true;
-
-            ctx.AdvanceToNextPlayer();
-
-            Assert.AreEqual(2, ctx.CurrentPlayerIndex);
-            Assert.IsFalse(ctx.SkipNextPlayer, "flag se vynuluje");
-            Assert.IsTrue(skipped, "OnPlayerSkipped vystřelí");
-        }
-
-        [Test] // S4.3 — skip wrapuje kolem konce seznamu (modulo)
-        public void Advance_WithSkip_WrapsAroundEnd()
-        {
-            var ctx = CtxWith(3);
-            ctx.CurrentPlayerIndex = 2;
-            ctx.SkipNextPlayer = true;
-            ctx.AdvanceToNextPlayer();
-            Assert.AreEqual(1, ctx.CurrentPlayerIndex); // (2+2)%3
-        }
-
         [Test] // S4.1 — normální posun wrapuje
         public void Advance_WrapsAroundEnd()
         {
@@ -93,19 +67,19 @@ namespace Prsi.Tests.EditMode
             Assert.AreSame(winner, notified);
         }
 
-        [Test] // ResetRoundState clears forced suit, penalty and skip
+        [Test] // ResetRoundState clears forced suit, draw penalty and ace-pending
         public void ResetRoundState_ClearsTransientEffects()
         {
             var ctx = CtxWith(2);
             ctx.NotifyDrawPenalty(4);
             ctx.NotifySuitChanged(Suit.Clubs);
-            ctx.SkipNextPlayer = true;
+            ctx.AcePending = true;
 
             ctx.ResetRoundState();
 
             Assert.AreEqual(0, ctx.PendingDrawCount);
             Assert.IsNull(ctx.ForcedSuit);
-            Assert.IsFalse(ctx.SkipNextPlayer);
+            Assert.IsFalse(ctx.AcePending);
         }
     }
 }

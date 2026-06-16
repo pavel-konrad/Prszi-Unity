@@ -21,12 +21,13 @@ namespace Prsi.Core.Game
                 : null;
         
         // === Special Card Effects ===
-        
+
         /// <summary>
-        /// Přeskočit dalšího hráče (efekt esa)
+        /// Eso efekt: na vrchu je eso, další hráč musí přebít vlastním esem,
+        /// nebo stojí (přeskočí tah) — ale NELÍZNE. True dokud někdo nestojí.
         /// </summary>
-        public bool SkipNextPlayer { get; set; }
-        
+        public bool AcePending { get; set; }
+
         /// <summary>
         /// Počet karet k líznutí (efekt sedmy, kumulativní)
         /// </summary>
@@ -49,7 +50,6 @@ namespace Prsi.Core.Game
         public event System.Action<Suit> OnSuitChanged;
         public event System.Action OnForcedSuitCleared;
         public event System.Action<int> OnDrawPenalty;
-        public event System.Action OnPlayerSkipped;
         
         public GameContext(List<IPlayerData> players)
         {
@@ -60,20 +60,11 @@ namespace Prsi.Core.Game
         // === Helper Methods ===
         
         /// <summary>
-        /// Posune na dalšího hráče
+        /// Posune na dalšího hráče v pořadí.
         /// </summary>
         public void AdvanceToNextPlayer()
         {
-            if (SkipNextPlayer)
-            {
-                SkipNextPlayer = false;
-                CurrentPlayerIndex = (CurrentPlayerIndex + 2) % players.Count;
-                OnPlayerSkipped?.Invoke();
-            }
-            else
-            {
-                CurrentPlayerIndex = (CurrentPlayerIndex + 1) % players.Count;
-            }
+            CurrentPlayerIndex = (CurrentPlayerIndex + 1) % players.Count;
         }
         
         /// <summary>
@@ -147,7 +138,7 @@ namespace Prsi.Core.Game
         public void ResetRoundState()
         {
             PendingDrawCount = 0;
-            SkipNextPlayer = false;
+            AcePending = false;
             ClearForcedSuit();
         }
     }

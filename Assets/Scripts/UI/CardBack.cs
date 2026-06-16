@@ -51,6 +51,15 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
             return;
         }
         
+        // Eso efekt: na čekající eso se NElíže — klik na balíček = „stůj" (přeskok).
+        var rules = GameSession.I.Rules;
+        if (rules != null && rules.AcePending)
+        {
+            rules.AcePending = false;
+            StartCoroutine(StandThenPass(human));
+            return;
+        }
+
         // Najít CardManager
         CardManager cardManager = FindObjectOfType<CardManager>();
         if (cardManager == null)
@@ -58,10 +67,10 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
             Debug.LogError("[CardBack] CardManager nebyl nalezen!");
             return;
         }
-        
-        
+
+
         // V Prší si hráč může líznout kartu i když má hratelnou kartu
-        
+
         // Líznout kartu
         Card drawnCard = cardManager.DrawCardForPlayer(human);
         
@@ -70,6 +79,15 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
             Debug.LogWarning("[CardBack] Žádná karta k líznutí (balíček i odhazovací prázdné), předávám tah");
 
         // In Prší drawing ends the turn — pass even if no card could be drawn.
+        GameSession.I.ActivateNextPlayer();
+    }
+
+    // Human „stojí" na eso: krátká hláška v jeho baru, pak předá tah.
+    System.Collections.IEnumerator StandThenPass(Player human)
+    {
+        PlayerEffectDisplay.Instance?.ShowSkip(human);
+        yield return new WaitForSeconds(1.0f);
+        PlayerEffectDisplay.Instance?.Hide(human);
         GameSession.I.ActivateNextPlayer();
     }
 }

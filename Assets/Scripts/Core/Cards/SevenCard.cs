@@ -30,6 +30,12 @@ namespace Prsi.Core.Cards
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
+            // Na čekající eso lze reagovat jen esem.
+            if (context?.AcePending == true)
+            {
+                return false;
+            }
+
             // Pokud je aktivní penalizace, lze zahrát pouze sedmu (obrana)
             if (context?.PendingDrawCount > 0)
             {

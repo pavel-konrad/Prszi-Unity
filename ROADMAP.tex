@@ -1,0 +1,168 @@
+\documentclass[11pt]{article}
+
+\usepackage{fontspec}
+
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{titlesec}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+
+\definecolor{accent}{HTML}{1F6FB2}
+\definecolor{soft}{HTML}{555555}
+
+\titleformat{\section}{\Large\bfseries\color{accent}}{}{0em}{}
+\titleformat{\subsection}{\large\bfseries}{}{0em}{}
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\newcommand{\phase}[2]{\subsection{#1 \textnormal{\textcolor{soft}{\small— #2}}}}
+\newcommand{\field}[1]{\textbf{#1.}\ }
+
+\begin{document}
+
+\begin{center}
+{\huge\bfseries\color{accent} Multiplayer Prší — Backend Roadmap}\\[4pt]
+{\large junior $\rightarrow$ mid}
+\end{center}
+
+\vspace{4pt}
+
+\textit{Cíl: postavit server-authoritative multiplayer backend pro Prší a přitom si do
+hloubky osahat klíčové koncepty a patterns. Napsat to \textbf{sám} (paměť + kód + úsudek).}
+
+\textit{Klient = Unity (jen view + input). Pravdu o hře drží server.}
+
+\textit{Stack je koncept-first: u každé fáze je primárně Rails a vedle .NET ekvivalent —
+roadmapa slouží, ať zvolíš Rails nebo C\#/ASP.NET Core. Patterns jsou jazykově nezávislé;
+mění se jen nástroje.}
+
+\section{Jak roadmapu číst}
+
+Každá fáze má: \textbf{Koncept} (co a proč) $\cdot$ \textbf{Postav} (co přidat do Prší) $\cdot$
+\textbf{Hloubka} (kam jít, aby to bylo mid) $\cdot$ \textbf{Rails / .NET} (nástroje) $\cdot$
+\textbf{Reference} $\cdot$ \textbf{Ověření} (otázka — když na ni umíš odpovědět z hlavy, fázi máš).
+
+Časový odhad: \textbf{\textasciitilde6–8 týdnů při 3–4 h/den} (odhad, ne slib).
+
+\section{Fáze}
+
+\phase{Fáze 0 — Setup}{1–2 dny}
+\field{Koncept} Kostra projektu.
+\field{Postav} Rails 8 API-only + Postgres + RSpec + Rubocop + Git (nebo \texttt{dotnet new webapi} + EF Core + xUnit).
+\field{Hloubka} Co API-only režim vypne (views, asset pipeline) a proč to nechceš.
+\field{Reference} \url{https://guides.rubyonrails.org/api_app.html} $\cdot$ \url{https://learn.microsoft.com/aspnet/core/web-api/}
+\field{Ověření} Proč API-only? Co tím ztrácíš a proč ti to nevadí?
+
+\phase{Fáze 1 — Doménový port + TDD}{cca týden}
+\field{Koncept} Entity vs Value Object, agregát, business pravidla. Čistá doména bez DB a frameworku.
+\field{Postav} Přepiš pravidla karet (máš odladěná v \texttt{Prsi.Core}): \texttt{Card} jako value object (immutable suit+rank), \texttt{can\_play\_on?}, efekty sedmy/dámy/esa. Žádný ActiveRecord. TDD.
+\field{Hloubka} Proč je karta value object (rovná se hodnotou) a hra entita (má identitu). Immutabilita. \textbf{Trap:} nepiš C\# v Ruby (žádný factory/interface). V C\# naopak reuse \texttt{Prsi.Core} přímo.
+\field{Reference} \url{https://martinfowler.com/bliki/ValueObject.html} $\cdot$ \url{https://martinfowler.com/eaaCatalog/domainModel.html}
+\field{Ověření} Proč je \texttt{Card} value object a \texttt{Game} entita? Kde je ta hranice?
+
+\phase{Fáze 2 — Persistence}{cca týden — nejtěžší nový kus}
+\field{Koncept} Mapování domény do DB. Agregát $\rightarrow$ tabulky. Zdroj pravdy v Postgresu.
+\field{Postav} Tabulky \texttt{users}, \texttt{games}, \texttt{players}, \texttt{moves}, stav rukou. Rozhodni: (A) snapshot stavu, nebo (B) seed + log Moves a „přehraj" (event sourcing; seedovaný deck to umožňuje). Doporučení: ukládej Moves \emph{i} snapshot = CQRS read model.
+\field{Hloubka} AR asociace, indexy, transakce, N+1 (\texttt{includes}/\texttt{joins}/\texttt{preload}), perzistence agregátu bez nekonzistentního stavu.
+\field{Reference} \url{https://guides.rubyonrails.org/active_record_basics.html} $\cdot$ \url{https://guides.rubyonrails.org/active_record_querying.html} $\cdot$ \url{https://learn.microsoft.com/ef/core/}
+\field{Ověření} Kde je zdroj pravdy? Když server spadne uprostřed tahu, jak se hra obnoví?
+
+\phase{Fáze 3 — State machine}{3–5 dní}
+\field{Koncept} Finite state machine, přechody, guards. Lifecycle hry.
+\field{Postav} \texttt{waiting\_for\_players} $\rightarrow$ \texttt{playing} $\rightarrow$ \texttt{finished}. Zakázat \texttt{finished} $\rightarrow$ \texttt{playing} (musí vyhodit chybu). První testy.
+\field{Hloubka} Guards (do \texttt{playing} jen při $\geq$ 2 hráčích), callbacky na přechodu, proč stav nepatří do controlleru.
+\field{Rails / .NET} Gem \textbf{AASM} / knihovna \textbf{Stateless} nebo vlastní enum + guardy.
+\field{Reference} \url{https://github.com/aasm/aasm} $\cdot$ \url{https://rubyguides.dev/guides/ruby-state-machine-gem/}
+\field{Ověření} Napiš test, že \texttt{finished} $\rightarrow$ \texttt{playing} vyhodí chybu a nezmění stav. Proč guard, ne \texttt{if} v controlleru?
+
+\phase{Fáze 4 — Service objekty}{3–5 dní}
+\field{Koncept} Aplikační vrstva. Orchestrace mimo model i controller.
+\field{Postav} \texttt{PlayCardService.call(...)}, \texttt{JoinGameService}. Vytáhni změť z Unity \texttt{CardManager.PlayCard} (validace + efekt + výhra + posun tahu). Vrať strukturovaný výsledek.
+\field{Hloubka} Co patří do modelu (pravidla) vs service (orchestrace). „Model nevolá model." Transakce kolem akce.
+\field{Rails / .NET} PORO service + ServiceResult / \textbf{MediatR} command handler.
+\field{Reference} \url{https://martinfowler.com/eaaCatalog/serviceLayer.html} $\cdot$ \url{https://github.com/jbogard/MediatR}
+\field{Ověření} Co dělá service a co model? Proč ne všechno do modelu?
+
+\phase{Fáze 5 — Konkurence a zamykání}{cca týden — TADY junior $\rightarrow$ mid}
+\field{Koncept} Race conditions. Dva hráči naráz. Idempotence.
+\field{Postav} Obal tah zámkem. Přidej \texttt{idempotency\_key} (dvojklik/retry nesmí zahrát kartu dvakrát).
+\field{Hloubka} Optimistic (\texttt{lock\_version} + retry na \texttt{StaleObjectError}) vs pessimistic (\texttt{with\_lock} / \texttt{SELECT … FOR UPDATE}). Izolační úrovně. Jak race \emph{otestovat} (vlákna).
+\field{Rails / .NET} AR locking / EF Core concurrency tokens (\texttt{RowVersion}).
+\field{Reference} \url{https://blog.saeloun.com/2022/03/23/rails-7-adds-lock-with/} $\cdot$ \url{https://api.rubyonrails.org/classes/ActiveRecord/Locking/Pessimistic.html} $\cdot$ \url{https://baweaver.com/writing/2026/06/05/rails-sharp-parts-lock-is-not-a-mutex/} $\cdot$ \url{https://learn.microsoft.com/ef/core/saving/concurrency}
+\field{Ověření} Co se stane při dvojkliku? Který zámek a proč? Jak ten race otestuješ?
+
+\phase{Fáze 6 — HTTP API + kontrakt}{cca týden}
+\field{Koncept} REST sémantika. Tvůj zájem o protokoly přímo tady.
+\field{Postav} Endpointy: vytvoř/připoj/zahraj/lízni/načti stav. Statusy: 200/201/422 (data)/409 (konflikt stavu). Auth tokenem.
+\field{Hloubka} Metody (PUT idempotentní vs POST), status kódy a proč, idempotence, kde žije token (header vs cookie), CORS.
+\field{Rails / .NET} Action Controller / ASP.NET Core controllers + minimal API.
+\field{Reference} \url{https://developer.mozilla.org/en-US/docs/Web/HTTP} $\cdot$ \url{https://guides.rubyonrails.org/action_controller_overview.html} $\cdot$ \url{https://guides.rubyonrails.org/security.html}
+\field{Ověření} Nevalidní tah $\rightarrow$ 422 nebo 409? Obhaj to. Proč je \texttt{GET} bezpečný a \texttt{POST} ne?
+
+\phase{Fáze 7 — Event-driven design}{3–5 dní}
+\field{Koncept} Observer pattern, decoupling.
+\field{Postav} Po zahrání karty event \texttt{CardPlayed} $\rightarrow$ odběratelé: ulož Move, zapiš audit, notifikuj realtime. (\texttt{GameContext} v Unity má eventy už teď — předloha.)
+\field{Hloubka} Proč přes event a ne přímým voláním (přidání odběratele nemění service). Sync vs async. Hranice, ať z toho není spaghetti.
+\field{Rails / .NET} \texttt{ActiveSupport::Notifications} / EventBus / \textbf{MediatR} notifications.
+\field{Reference} \url{https://guides.rubyonrails.org/active_support_instrumentation.html} $\cdot$ \url{https://martinfowler.com/articles/201701-event-driven.html}
+\field{Ověření} Proč audit přes event a ne přímo v \texttt{PlayCardService}? Co tím získáš?
+
+\phase{Fáze 8 — Realtime}{cca týden}
+\field{Koncept} Push „soupeř táhl". WebSocket vs HTTP.
+\field{Postav} Nejdřív polling (Unity se ptá každou 1–2 s). Pak refactor na WebSocket: server pushne stav všem u stolu.
+\field{Hloubka} WS handshake (HTTP upgrade) vs request/response. Stavové spojení. Pub/sub backend přes víc procesů.
+\field{Rails / .NET} \textbf{ActionCable} (Solid Cable bez Redisu / Redis adapter) / \textbf{SignalR} (volitelně Redis backplane).
+\field{Reference} \url{https://guides.rubyonrails.org/action_cable_overview.html} $\cdot$ \url{https://gorails.com/series/realtime-group-chat-with-hotwire} $\cdot$ \url{https://oneuptime.com/blog/post/2026-01-29-realtime-apps-signalr-dotnet/view} $\cdot$ referenční tahová hra na ASP.NET Core+SignalR+EF Core: \url{https://github.com/phuchautea/UniXiangqi}
+\field{Ověření} Čím se WS handshake liší od HTTP requestu? Proč single-process pub/sub v produkci nestačí?
+
+\phase{Fáze 9 — Docker + CI/CD}{3–5 dní}
+\field{Koncept} Reprodukovatelné prostředí. Zelený build po pushi.
+\field{Postav} \texttt{compose.yaml}: Rails + Postgres jedním příkazem. GitHub Actions: install $\rightarrow$ testy $\rightarrow$ rubocop.
+\field{Hloubka} Multi-stage Dockerfile (build vs runtime), non-root, \texttt{host: db} ne \texttt{localhost}, named volume. Service containers v CI.
+\field{Reference} \url{https://docs.docker.com/guides/ruby/containerize/} $\cdot$ \url{https://danielabaron.me/blog/rails-postgres-docker/} $\cdot$ \url{https://github.com/actions/starter-workflows/blob/main/ci/rubyonrails.yml}
+\field{Ověření} Spustí nový člověk projekt za 5 minut z čistého stroje? Proč multi-stage build?
+
+\phase{Fáze 10 — Bonus (vyber 1)}{}
+\begin{itemize}
+  \item \textbf{Replay hry} — těží ze seed + Moves (pokud jsi šel cestou B v Fázi 2).
+  \item \textbf{Leaderboard} — \textbf{Redis sorted set} (\texttt{ZADD}/\texttt{ZREVRANGE}). \url{https://redis.io/docs/latest/develop/data-types/sorted-sets/}
+  \item \textbf{AI hráč} — server-side bot (logiku máš v Unity \texttt{GameplayState}/\texttt{CardManager}).
+\end{itemize}
+
+\section{Joby: Solid Queue vs Sidekiq vs Redis}
+
+Nejsou to konkurenti z jedné police:
+
+\begin{longtable}{p{4.2cm} p{4.6cm} p{4.6cm}}
+\textbf{Funkce} & \textbf{DB-based (bez Redisu)} & \textbf{Redis-based}\\
+\hline
+Background joby & \textbf{Solid Queue} (default Rails 8) & Sidekiq\\
+Cache & Solid Cache & Redis cache\\
+ActionCable pub/sub & Solid Cable & redis adapter\\
+\end{longtable}
+
+\textbf{Redis} = úložiště/datové struktury, ne job systém. Přidej ho \emph{až} pro konkrétní
+důvod (leaderboard sorted set, hot cache). Pro tenhle projekt \textbf{Solid Queue stačí, Redis
+nepotřebuješ}. Detail: Solid Queue polluje DB přes \texttt{FOR UPDATE SKIP LOCKED} a umí
+enqueue ve stejné transakci jako data.
+
+\section{Průběžně (10 min/den) — Fowler}
+
+\url{https://martinfowler.com/articles/201701-event-driven.html} (Event-Driven) $\cdot$
+\url{https://martinfowler.com/eaaCatalog/domainModel.html} (Domain Model) $\cdot$
+\url{https://martinfowler.com/bliki/CQRS.html} (CQRS — jen pochopit)
+
+\section{Co přeskočit (příští 2 měsíce)}
+
+Kubernetes $\cdot$ Kafka $\cdot$ Microservices $\cdot$ React $\cdot$ GraphQL
+
+\section{Výsledek}
+
+multiplayer backend $\cdot$ state machine $\cdot$ observer pattern $\cdot$ testy $\cdot$
+concurrence/locking $\cdot$ HTTP kontrakt $\cdot$ realtime $\cdot$ Docker $\cdot$ CI/CD $\cdot$
+portfolio projekt $\cdot$ základ pro JINGI
+
+\end{document}

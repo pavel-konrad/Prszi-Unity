@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Prsi.Core.Cards;
 
 public class GameplayState : IGameState
 {
@@ -65,10 +66,12 @@ public class GameplayState : IGameState
             ? GameSession.I.Players[GameSession.I.ActiveIndex]
             : null;
 
-        // Eso efekt: tento hráč je přeskočen — krátce „stojí" s hláškou, pak předá dál.
-        if (activePlayer != null && GameSession.I.Rules != null && GameSession.I.Rules.SkipNextPlayer)
+        // Eso efekt: na vrchu je eso. Kdo nemá vlastní eso na obranu, automaticky
+        // „stojí" (přeskočí, NElíže). Kdo eso má, hraje normálně (může přebít).
+        if (activePlayer != null && GameSession.I.Rules != null
+            && GameSession.I.Rules.AcePending && !HasAce(activePlayer))
         {
-            GameSession.I.Rules.SkipNextPlayer = false;
+            GameSession.I.Rules.AcePending = false;
             _runner.StartCoroutine(SkipTurn(activePlayer));
             return;
         }
@@ -91,6 +94,14 @@ public class GameplayState : IGameState
         }
     }
     
+    // Má hráč v ruce eso (na obranu proti čekajícímu esu)?
+    bool HasAce(Player player)
+    {
+        foreach (Card c in player.hand)
+            if (c.rank == Rank.Ace) return true;
+        return false;
+    }
+
     // Eso efekt: přeskočený hráč krátce „stojí" (hláška v UI), pak se předá tah dál.
     IEnumerator SkipTurn(Player player)
     {
