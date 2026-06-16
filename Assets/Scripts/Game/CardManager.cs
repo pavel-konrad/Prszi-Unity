@@ -69,8 +69,6 @@ public class CardManager : MonoBehaviour
                 }
             }
         }
-        
-        InitializeDeck();
     }
     
     void InitializeDeck()
@@ -89,7 +87,12 @@ public class CardManager : MonoBehaviour
     public void DealCardsToPlayers()
     {
         if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand je null!"); return; }
-        
+
+        // Build a fresh 32-card deck for the new hand. Done here (not in Awake) so a
+        // new round without a scene reload starts full, and so CardSpriteManager has
+        // already loaded its sprites by the time the Cards are created.
+        InitializeDeck();
+
         // Reset transient rule state so a Seven/Queen/Ace effect can't leak into a new hand.
         GameSession.I.Rules?.ResetRoundState();
 
