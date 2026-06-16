@@ -326,9 +326,10 @@ public class CardManager : MonoBehaviour
         {
             count = rules.PendingDrawCount;
             rules.ClearDrawPenalty();
-            // Seven effect: show "+N" in the drawing player's bar.
-            PlayerEffectDisplay.Instance?.ShowDraw(player, count);
         }
+
+        // Show "+N" in the drawing player's bar (Seven penalty = many, normal = +1).
+        PlayerEffectDisplay.Instance?.ShowDraw(player, count);
 
         Card last = null;
         for (int i = 0; i < count; i++) last = DrawOneForPlayer(player);
