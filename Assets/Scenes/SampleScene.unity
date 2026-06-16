@@ -999,6 +999,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   thumbnail: {fileID: 171251044}
+--- !u!1 &180365656 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 1314064219}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &184054096 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1785429937657651729, guid: 76d0c44a39cd3424f8fc5d9595c92439, type: 3}
@@ -1079,6 +1084,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 188076508}
   m_CullTransparentMesh: 1
+--- !u!1 &190160805 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 843417340}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &218441565
 GameObject:
   m_ObjectHideFlags: 0
@@ -3087,6 +3097,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 709897074}
   m_CullTransparentMesh: 1
+--- !u!1 &718272293 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 1271176138}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &734298625
 GameObject:
   m_ObjectHideFlags: 0
@@ -3573,6 +3588,10 @@ PrefabInstance:
       value: -49.619873
       objectReference: {fileID: 0}
     - target: {fileID: 6933679213163934844, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -4556,7 +4575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33eaf00452bec46a4a2d3f25e146d4a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deck: {fileID: 2113772844}
+  deckSeed: 0
   discard: {fileID: 42191869}
   playerHand: {fileID: 125767630}
   playerHandUI: {fileID: 125767631}
@@ -6199,11 +6218,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6933679213163934844, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7589155523174213657, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       propertyPath: m_Color.a
       value: 0.5254902
+      objectReference: {fileID: 0}
+    - target: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6549,6 +6572,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6933679213163934844, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8158203299017989221, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -6873,10 +6900,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   indicators:
-  - {fileID: 0}
-  - {fileID: 843417341}
-  - {fileID: 1314064220}
-  - {fileID: 1271176139}
+  - bar: {fileID: 1501025318}
+    root: {fileID: 190160805}
+    suitSymbol: {fileID: 843417341}
+  - bar: {fileID: 1220221112}
+    root: {fileID: 180365656}
+    suitSymbol: {fileID: 1314064220}
+  - bar: {fileID: 1444089840}
+    root: {fileID: 718272293}
+    suitSymbol: {fileID: 1271176139}
   heartsTexture: {fileID: 2800000, guid: ff9d231583eba4305a981033fa285b2c, type: 3}
   diamondsTexture: {fileID: 2800000, guid: 45f5b696ce75d42a0baba27f7a5e7772, type: 3}
   clubsTexture: {fileID: 2800000, guid: edc4858d397564519b5c6448c6b963df, type: 3}

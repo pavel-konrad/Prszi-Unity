@@ -4,15 +4,24 @@ using Prsi.Core.Cards;
 using Prsi.Core.Game;
 
 /// <summary>
-/// Shows the forced suit on the bar of the player who played the Queen.
-/// Passive view driven by the shared GameContext: lights up the matching suit
-/// symbol on suit change, hides everything when the forced suit is cleared or a
-/// new hand is dealt. All indicators are hidden by default.
+/// Shows the forced suit ("barva tahu") on the bar of the player who played the
+/// Queen. The whole indicator (frame + symbol) is hidden by default and shown only
+/// while a forced suit is active. Passive view driven by the shared GameContext.
+///
+/// The bar is matched to the player via PlayerUI.Bound (not array order), so it
+/// lands on the right enemy regardless of how the bars are ordered in the scene.
 /// </summary>
 public class ForcedSuitDisplay : MonoBehaviour
 {
-    [Tooltip("Suit indicator per player, indexed by player Id (0 = human, 1..3 = enemies).")]
-    [SerializeField] private RawImage[] indicators;
+    [System.Serializable]
+    public struct Indicator
+    {
+        public PlayerUI bar;          // identifies which player this bar shows
+        public GameObject root;       // EnemyGameStat (frame + symbol) toggled on/off
+        public RawImage suitSymbol;   // CardSuit image set to the forced suit
+    }
+
+    [SerializeField] private Indicator[] indicators;
 
     [SerializeField] private Texture heartsTexture;
     [SerializeField] private Texture diamondsTexture;
@@ -43,14 +52,25 @@ public class ForcedSuitDisplay : MonoBehaviour
     {
         HideAll();
 
-        int idx = GameSession.I.ActiveIndex; // the player who just played the Queen
-        if (indicators == null || idx < 0 || idx >= indicators.Length) return;
+        Player active = ActivePlayer();
+        if (active == null) return;
 
-        RawImage img = indicators[idx];
-        if (img == null) return;
+        // Show the indicator on the bar bound to the player who played the Queen.
+        foreach (var ind in indicators)
+        {
+            if (ind.bar == null || ind.bar.Bound != active) continue;
+            if (ind.suitSymbol != null) ind.suitSymbol.texture = TextureFor(suit);
+            if (ind.root != null) ind.root.SetActive(true);
+            break;
+        }
+    }
 
-        img.texture = TextureFor(suit);
-        img.gameObject.SetActive(true);
+    Player ActivePlayer()
+    {
+        var gs = GameSession.I;
+        if (gs == null) return null;
+        int i = gs.ActiveIndex;
+        return i >= 0 && i < gs.Players.Count ? gs.Players[i] : null;
     }
 
     Texture TextureFor(Suit suit) => suit switch
@@ -65,7 +85,7 @@ public class ForcedSuitDisplay : MonoBehaviour
     void HideAll()
     {
         if (indicators == null) return;
-        foreach (RawImage img in indicators)
-            if (img != null) img.gameObject.SetActive(false);
+        foreach (var ind in indicators)
+            if (ind.root != null) ind.root.SetActive(false);
     }
 }
