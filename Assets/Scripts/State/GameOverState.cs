@@ -17,11 +17,20 @@ public class GameOverState : IGameState
 
     public void Enter()
     {
-        var winner = TournamentRules.OverallWinner(new List<ITournamentPlayer>(GameSession.I.Players));
-        string name = winner != null ? winner.Name : "?";
+        var gs = GameSession.I;
+        var winner = TournamentRules.OverallWinner(new List<ITournamentPlayer>(gs.Players));
+
+        // Zpráva podle toho, jak hra skončila pro human hráče.
+        string message;
+        if (gs.Human != null && gs.Human.Cash == 0)
+            message = "Vypadl jsi!";
+        else if (winner != null && winner == (ITournamentPlayer)gs.Human)
+            message = "Vyhrál jsi!";
+        else
+            message = winner != null ? $"Vítěz: {winner.Name}" : "Konec hry";
 
         if (GameOverModal.Instance != null)
-            GameOverModal.Instance.Show(name, ToMenu);
+            GameOverModal.Instance.Show(message, ToMenu);
         else
             ToMenu();
     }

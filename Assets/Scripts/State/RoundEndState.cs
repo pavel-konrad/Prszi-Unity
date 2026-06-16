@@ -51,7 +51,16 @@ public class RoundEndState : IGameState
 
     void Advance()
     {
-        var remaining = TournamentRules.RemainingPlayers(new List<ITournamentPlayer>(GameSession.I.Players));
+        var gs = GameSession.I;
+
+        // Když vypadne human, hra pro něj končí (nehrajeme dál jen mezi AI).
+        if (gs.Human != null && gs.Human.Cash == 0)
+        {
+            _fsm.Go<GameOverState>();
+            return;
+        }
+
+        var remaining = TournamentRules.RemainingPlayers(new List<ITournamentPlayer>(gs.Players));
         if (remaining.Count > 1) _fsm.Go<DealingState>();
         else _fsm.Go<GameOverState>();
     }

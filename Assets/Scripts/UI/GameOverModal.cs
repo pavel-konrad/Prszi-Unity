@@ -29,10 +29,10 @@ public class GameOverModal : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    public void Show(string winnerName, Action onMenu)
+    public void Show(string message, Action onMenu)
     {
         _onMenu = onMenu;
-        if (titleText) titleText.text = $"Vítěz turnaje: {winnerName}";
+        if (titleText) titleText.text = message;
         if (panel) panel.SetActive(true);
     }
 
