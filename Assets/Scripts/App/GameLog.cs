@@ -39,6 +39,14 @@ public static class GameLog
         var r = gs != null ? gs.Rules : null;
         var top = Cards != null ? Cards.GetTopDiscardCard() : null;
 
+        // Catch the "two cards in one turn" bug: two PLAY events with no ACTIVE between.
+        if (ev == "PLAY" && _log.entries.Count > 0)
+        {
+            var prev = _log.entries[_log.entries.Count - 1];
+            if (prev.ev == "PLAY")
+                Debug.LogWarning($"[GameLog] DOUBLE PLAY: {prev.player} '{prev.card}' then {player} '{card}' (no turn change between)");
+        }
+
         _log.entries.Add(new Entry
         {
             seq = ++_seq,
