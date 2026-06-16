@@ -46,37 +46,14 @@ public class DealingState : IGameState
             Debug.LogError("[DealingState] CardManager nebyl nalezen! Zkontrolujte, zda je v scéně.");
         }
 
-        // Nejdřív nastavit sázky AI hráčů a odečíst peníze
-        for (int i = 1; i < GameSession.I.Players.Count; i++)
-        {
-            var p = GameSession.I.Players[i];
-            
-            // Zvýraznit aktuálního AI hráče
-            GameSession.I.SetActiveIndex(i);
-            
-            // Ujisti se, že AI má nastavenou dostupnou sázku
-            if (p.Bet <= 0 || p.Bet > p.Cash)
-            {
-                int newBet = BetRules.RandomAffordable(p.Cash);
-                p.SetBet(newBet);
-            }
-            
-            // Odečíst sázku od peněz a přidat do potu
-            int staked = p.PlaceBet();
-            GameSession.I.AddToPot(staked);
-            
-            // Prodleva mezi sázkami AI hráčů
-            yield return new WaitForSeconds(0.8f);
-        }
-        
         // Vyvolat události pro UI
         GameSession.I.NotifySessionChanged();
-        
-        // Nastavit aktivního hráče
-        GameSession.I.SetActiveIndex(0); // human začíná
-        
-        // Přejít do stavu výběru sázky člověka
-        _fsm.Go<BetSelectionState>();
+
+        // Human začíná
+        GameSession.I.SetActiveIndex(0);
+
+        // Rovnou do hry (žádné sázení — turnaj řeší ekonomiku až na konci kola)
+        _fsm.Go<GameplayState>();
     }
     
     // Spustit animace rozdávání pro všechny hand komponenty

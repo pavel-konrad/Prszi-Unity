@@ -157,16 +157,10 @@ public class GameplayState : IGameState
         CheckActivePlayer();
     }
     
-    // Volá se když hráč vyhraje
+    // Volá se když hráč vyhraje kolo → vyhodnocení kola (RoundEndState v Phase C).
     void OnPlayerWon(Player winner)
     {
-        
-        // Vyplatit bank vítězi
-        GameSession.I.PayoutToWinner(winner.Id);
-        
-        // Přejít zpět do menu nebo začít nové kolo
-        // Pro teď přejdeme zpět do menu
-        _fsm.Go<MenuState>();
+        _fsm.Go<RoundEndState>();
     }
     
     // Veřejná metoda pro validaci karty (volá se z UI)

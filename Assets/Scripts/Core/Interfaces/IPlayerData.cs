@@ -13,7 +13,6 @@ namespace Prsi.Core
         bool IsHuman { get; }
         Sprite Avatar { get; }
         int Cash { get; }
-        int Bet { get; }
         IReadOnlyList<ICardData> Hand { get; }
         bool HasWon { get; }
         bool CanPlay { get; }

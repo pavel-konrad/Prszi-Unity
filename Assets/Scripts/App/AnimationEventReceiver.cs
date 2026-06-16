@@ -245,18 +245,4 @@ public class AnimationEventReceiver : MonoBehaviour
         AudioEvents.TriggerGameStart();
     }
     
-    // Funkce pro zavření modalu po animaci
-    public void OnModalCloseComplete()
-    {
-        // Najít a zavřít modal
-        var modalManager = FindObjectOfType<ModalManager>();
-        if (modalManager != null)
-        {
-            // Zavřít modal po dokončení animace
-            if (modalManager.betModal != null)
-            {
-                modalManager.betModal.SetActive(false);
-            }
-        }
-    }
 }

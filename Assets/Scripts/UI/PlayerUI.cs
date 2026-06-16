@@ -13,17 +13,25 @@ public class PlayerUI : MonoBehaviour
 
 	Player bound;
 	public Player Bound => bound; // Pro debug
-	int lastCash, lastStaked;
+	int lastCash;
+	CanvasGroup canvasGroup;
+
+	void Awake()
+	{
+		// Used to hide the bar on elimination without deactivating the GameObject
+		// (which would stop its coroutines / event refresh).
+		canvasGroup = GetComponent<CanvasGroup>();
+		if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+	}
 
 	public void Bind(Player p)
 	{
 		if (bound != null) bound.Changed -= OnChanged;
 		bound = p;
-		if (bound != null) 
+		if (bound != null)
 		{
 			bound.Changed += OnChanged;
 			lastCash = bound.Cash;
-			lastStaked = bound.Staked;
 		}
 		Refresh();
 	}
@@ -60,36 +68,6 @@ public class PlayerUI : MonoBehaviour
 			lastCash = bound.Cash;
 		}
 		
-		// Bet text zobrazuje Staked když hráč už vsadil, jinak Bet
-		if (betText)
-		{
-			if (bound.Staked > 0)
-			{
-				// Hráč už vsadil - zobrazit Staked
-				if (bound.Staked != lastStaked)
-				{
-					// OKAMŽITĚ spustit animaci potu (zvuk se spustí přes Animation Event)
-					if (potAnimator != null)
-					{
-						potAnimator.SetTrigger("PotAnimate");
-					}
-					else
-					{
-						Debug.LogWarning($"[PlayerUI] PotAnimator je null pro {bound.Name}");
-					}
-					
-					// Pak spustit animaci čísla (bez zvuku)
-					StartCoroutine(AnimateNumber(betText, lastStaked, bound.Staked, 0.5f));
-					lastStaked = bound.Staked;
-				}
-			}
-			else
-			{
-				// Hráč ještě nevsadil - zobrazit Bet
-				betText.text = bound.Bet.ToString();
-			}
-		}
-
 		if (avatarImage)
 		{
 			if (bound.Avatar)
@@ -103,9 +81,17 @@ public class PlayerUI : MonoBehaviour
 			}
 		}
 
-		if (stateView) 
+		if (stateView)
 		{
 			stateView.SetActive(bound.IsActive);
+		}
+
+		// Eliminace: hráč bez peněz zmizí (bar zneviditelný, ale komponenta běží dál).
+		if (canvasGroup)
+		{
+			bool alive = bound.Cash > 0;
+			canvasGroup.alpha = alive ? 1f : 0f;
+			canvasGroup.blocksRaycasts = alive;
 		}
 	}
 

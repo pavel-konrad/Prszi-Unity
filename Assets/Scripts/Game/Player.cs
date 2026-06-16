@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Prsi.Core;
 using Prsi.Core.Cards;
+using Prsi.Core.Game;
 
 [Serializable]
-public class Player : IPlayerData
+public class Player : IPlayerData, ITournamentPlayer
 {
     public int Id;
     public string Name;
@@ -15,11 +16,7 @@ public class Player : IPlayerData
     public int AvatarIndex;
 
     public int Cash = 1000;
-    public int Bet  = 25;
 
-    // kolik má právě vsazeno v aktuální hře
-    public int Staked { get; private set; }
-    
     // Nové properties pro karty
     public List<Card> hand = new List<Card>();
     public bool hasFolded = false; // V prší: true = hráč už nemá karty (vyhrál)
@@ -45,53 +42,16 @@ public class Player : IPlayerData
 
     public void SetName(string n){ Name = string.IsNullOrWhiteSpace(n) ? "Player" : n.Trim(); Changed?.Invoke(this); }
     public void SetAvatar(Sprite s, int idx){ Avatar=s; AvatarIndex=idx; Changed?.Invoke(this); }
-    public void SetCash(int v){ 
-        Cash=Mathf.Max(0,v); 
-        Changed?.Invoke(this); 
+    public void SetCash(int v){
+        Cash=Mathf.Max(0,v);
+        Changed?.Invoke(this);
     }
-    public void SetBet(int v){ Bet =Mathf.Max(0,v); Changed?.Invoke(this); }
     public void NotifyChanged(){ Changed?.Invoke(this); }
 
-    public bool CanAffordBet() => Bet > 0 && Cash >= Bet;
+    // ITournamentPlayer money in/out (clamped at 0, fires Changed for the UI).
+    public void Pay(int amount)     => SetCash(Cash - amount);
+    public void Receive(int amount) => SetCash(Cash + amount);
 
-    /// Odečte sázku z Cash a uloží ji do Staked. Vrací skutečně vsazenou částku.
-    public int PlaceBet()
-    {
-        if (Bet <= 0) return 0;
-        int amount = Mathf.Min(Bet, Cash);
-        if (amount <= 0) return 0;
-
-        Cash  -= amount;
-        Staked += amount;
-        Changed?.Invoke(this);
-        return amount;
-    }
-
-    /// Vynuluje vsazenou částku (např. po vyplacení nebo refundu).
-    public void ResetStake()
-    {
-        if (Staked == 0) return;
-        Staked = 0;
-        Changed?.Invoke(this);
-    }
-
-    /// Vrátí vsazené peníze zpět (např. při zrušení hry)
-    public void RefundStake()
-    {
-        if (Staked <= 0) return;
-        Cash += Staked;
-        Staked = 0;
-        Changed?.Invoke(this);
-    }
-
-    /// Vyplatí výhru (přičte do Cash) – bez vztahu ke Staked (počítej zvlášť).
-    public void Payout(int amount)
-    {
-        if (amount <= 0) return;
-        Cash += amount;
-        Changed?.Invoke(this);
-    }
-    
     public void SetAvatar(Sprite s) {
         Avatar = s;
         Changed?.Invoke(this);
@@ -151,15 +111,19 @@ public class Player : IPlayerData
     /// Zkontroluje zda je hráč stále ve hře
     public bool IsInGame => !hasFolded;
 
-    // === Prsi.Core bridge (explicit IPlayerData implementation) ===
-    // Explicit impls map the public fields onto the domain interface without
-    // renaming fields or touching Unity serialization. HasWon/CanPlay/IsInGame
-    // already match IPlayerData and implement it implicitly.
+    // === Prsi.Core bridge (explicit interface implementations) ===
+    // Map the public fields onto the domain interfaces without renaming fields or
+    // touching Unity serialization. HasWon/CanPlay/IsInGame and the public
+    // Name/IsHuman/Cash already satisfy the interfaces implicitly.
     int IPlayerData.Id => Id;
     string IPlayerData.Name => Name;
     bool IPlayerData.IsHuman => IsHuman;
     Sprite IPlayerData.Avatar => Avatar;
     int IPlayerData.Cash => Cash;
-    int IPlayerData.Bet => Bet;
     IReadOnlyList<ICardData> IPlayerData.Hand => hand;
+
+    string ITournamentPlayer.Name => Name;
+    bool ITournamentPlayer.IsHuman => IsHuman;
+    int ITournamentPlayer.Cash => Cash;
+    IReadOnlyList<ICardData> ITournamentPlayer.Hand => hand;
 }

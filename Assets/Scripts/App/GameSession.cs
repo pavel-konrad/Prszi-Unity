@@ -14,12 +14,12 @@ public class GameSession : MonoBehaviour
 
     [Header("Economy")]
     public int startingCash = 1000;
-    public int defaultBet   = 25;
+    [Tooltip("Penalty per card value at round end (penalty = penaltyRate × Σ card value).")]
+    public int penaltyRate = 10;
 
     [Header("Options")]
     public bool uniqueAiNames   = true;
     public bool uniqueAiAvatars = true;
-    public bool randomizeAiBets = true;
 
     public static GameSession I { get; private set; }
 
@@ -27,8 +27,6 @@ public class GameSession : MonoBehaviour
     private List<Player> _players = new();
     public List<Player> Players => _players;
     public int ActiveIndex { get; private set; } = -1;
-
-    public int Pot { get; private set; } = 0;
 
     /// <summary>
     /// Shared Prší rule state (forced suit, draw penalty, skip) owned by the session.
@@ -38,7 +36,6 @@ public class GameSession : MonoBehaviour
 
     public event Action<Player,int> ActivePlayerChanged;
     public event Action SessionChanged;
-    public event Action<int> PotChanged;
 
     const string PREF_NAME = "p_name";
     const string PREF_AVI  = "p_avatar_idx";
@@ -97,55 +94,29 @@ public class GameSession : MonoBehaviour
     }
 
     // === Nové: start nové hry / vsazení potu ===
-    public void StartNewRound()
-    {
-        // Vynuluj pot a stake
-        Pot = 0;
-        foreach (var p in _players) p.ResetStake();
-        
-        PotChanged?.Invoke(Pot);
-        SessionChanged?.Invoke();
-    }
-
-    // Přidat sázku do potu
-    public void AddToPot(int amount)
-    {
-        Pot += amount;
-        PotChanged?.Invoke(Pot);
-    }
-
     // Vyvolat SessionChanged událost
     public void NotifySessionChanged()
     {
         SessionChanged?.Invoke();
     }
 
-    // Vyplacení banku vítězi (a vynulování stake)
-    public void PayoutToWinner(int winnerIndex)
+    /// Reset money for a fresh tournament: everyone back to startingCash (re-shows
+    /// bars hidden after elimination). Called when a new game starts from the menu.
+    public void ResetTournament()
     {
-        if (winnerIndex < 0 || winnerIndex >= _players.Count) return;
-        _players[winnerIndex].Payout(Pot);
-        Pot = 0;
-        foreach (var p in _players) p.ResetStake();
-
-        PotChanged?.Invoke(Pot);
+        foreach (var p in _players) p.SetCash(startingCash);
         SessionChanged?.Invoke();
     }
 
-    public void ApplyHumanFromMenu(string name, Sprite avatar, int avatarIndex, int? chosenBet = null)
+    public void ApplyHumanFromMenu(string name, Sprite avatar, int avatarIndex)
     {
+        // New game from the menu = fresh tournament: reset everyone's money.
+        ResetTournament();
+
         if (Human != null)
         {
             Human.SetName(name);
             Human.SetAvatar(avatar, avatarIndex);
-
-            if (Human.Cash <= 0) Human.SetCash(startingCash);
-
-            if (chosenBet.HasValue)
-                Human.SetBet(BetRules.ClampToPreset(chosenBet.Value));
-            else if (Human.Bet <= 0)
-                Human.SetBet(BetRules.ClampToPreset(defaultBet));
-
             Human.NotifyChanged();
         }
 
@@ -234,8 +205,6 @@ public class GameSession : MonoBehaviour
 
         // výchozí ekonomika pro humana (když nebyla nastavena ze scény)
         if (_players[0].Cash <= 0) _players[0].SetCash(startingCash);
-        if (_players[0].Bet  <= 0) _players[0].SetBet(BetRules.ClampToPreset(defaultBet));
-        
     }
 
     void ApplyHumanPrefsIfAny()
@@ -274,12 +243,7 @@ public class GameSession : MonoBehaviour
                 var sprite = aiAvatars[ai];
                 _players[i].SetAvatar(sprite, ai);
             }
-
-            // AI bet
-            if (randomizeAiBets)
-                _players[i].SetBet(BetRules.RandomAffordable(_players[i].Cash));
         }
-        
     }
     
     // Propojit AI hráče s AIHand UI komponentami
