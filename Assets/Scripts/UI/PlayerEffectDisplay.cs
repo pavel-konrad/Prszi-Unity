@@ -31,8 +31,8 @@ public class PlayerEffectDisplay : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    /// <summary>"STŮJ!" — the player is skipped by an Ace.</summary>
-    public void ShowSkip(Player player) => Show(player, "STŮJ!", new Color(1f, 0.3f, 0.3f));
+    /// <summary>Red "!" — the player is skipped by an Ace (stands).</summary>
+    public void ShowSkip(Player player) => Show(player, "!", new Color(1f, 0.25f, 0.25f));
 
     /// <summary>"+N" — the player must draw N cards from a Seven (auto-hides).</summary>
     public void ShowDraw(Player player, int count)

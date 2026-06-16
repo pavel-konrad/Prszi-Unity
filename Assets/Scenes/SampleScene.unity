@@ -2956,8 +2956,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54
-  m_fontSizeBase: 54
+  m_fontSize: 90
+  m_fontSizeBase: 90
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3020,12 +3020,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1220221108}
+  m_Father: {fileID: 1314064221}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 90}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &556635362 stripped
 Animator:
@@ -4461,15 +4461,15 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 2471626210176299108, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1436504212132368201, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1363701657}
     - targetCorrespondingSourceObject: {fileID: 365365740670353702, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1859891663}
     - targetCorrespondingSourceObject: {fileID: 365365740670353702, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1332052563}
+    - targetCorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1363701657}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4375897628943577145, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: -1
@@ -4504,6 +4504,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &843417342 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 843417340}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &853295392
 GameObject:
   m_ObjectHideFlags: 0
@@ -7428,12 +7433,12 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1436504212132368201, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1879348534}
     - targetCorrespondingSourceObject: {fileID: 365365740670353702, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1715499711}
+    - targetCorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1879348534}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4375897628943577145, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: -1
@@ -7468,6 +7473,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1271176140 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 1271176138}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1277176564
 GameObject:
   m_ObjectHideFlags: 0
@@ -7903,15 +7913,15 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 2471626210176299108, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1436504212132368201, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 534382698}
     - targetCorrespondingSourceObject: {fileID: 365365740670353702, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1114931230}
     - targetCorrespondingSourceObject: {fileID: 365365740670353702, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1050788473}
+    - targetCorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 534382698}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4375897628943577145, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
       insertIndex: -1
@@ -7946,6 +7956,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1314064221 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9103255460665693186, guid: bb89c3f5a1398412a8b87b43d2cf2c7a, type: 3}
+  m_PrefabInstance: {fileID: 1314064219}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1332052562
 GameObject:
   m_ObjectHideFlags: 0
@@ -8438,8 +8453,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54
-  m_fontSizeBase: 54
+  m_fontSize: 90
+  m_fontSizeBase: 90
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -8502,12 +8517,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1501025316}
+  m_Father: {fileID: 843417342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 90}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1375080790
 GameObject:
@@ -11346,8 +11361,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 54
-  m_fontSizeBase: 54
+  m_fontSize: 90
+  m_fontSizeBase: 90
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -11410,12 +11425,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1444089839}
+  m_Father: {fileID: 1271176140}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 90}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1880184871
 GameObject:
