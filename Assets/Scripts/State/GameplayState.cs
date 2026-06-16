@@ -61,11 +61,18 @@ public class GameplayState : IGameState
     // Zkontroluje aktivního hráče a spustí AI pokud je to AI hráč
     void CheckActivePlayer()
     {
-        var activePlayer = GameSession.I.ActiveIndex >= 0 && GameSession.I.ActiveIndex < GameSession.I.Players.Count 
-            ? GameSession.I.Players[GameSession.I.ActiveIndex] 
+        var activePlayer = GameSession.I.ActiveIndex >= 0 && GameSession.I.ActiveIndex < GameSession.I.Players.Count
+            ? GameSession.I.Players[GameSession.I.ActiveIndex]
             : null;
-            
-            
+
+        // Eso efekt: tento hráč je přeskočen — krátce „stojí" s hláškou, pak předá dál.
+        if (activePlayer != null && GameSession.I.Rules != null && GameSession.I.Rules.SkipNextPlayer)
+        {
+            GameSession.I.Rules.SkipNextPlayer = false;
+            _runner.StartCoroutine(SkipTurn(activePlayer));
+            return;
+        }
+
         if (activePlayer != null && !activePlayer.IsHuman && activePlayer.CanPlay)
         {
             _runner.StartCoroutine(ProcessAITurn(activePlayer));
@@ -84,6 +91,15 @@ public class GameplayState : IGameState
         }
     }
     
+    // Eso efekt: přeskočený hráč krátce „stojí" (hláška v UI), pak se předá tah dál.
+    IEnumerator SkipTurn(Player player)
+    {
+        PlayerEffectDisplay.Instance?.ShowSkip(player);
+        yield return new WaitForSeconds(1.2f);
+        PlayerEffectDisplay.Instance?.Hide(player);
+        GameSession.I.ActivateNextPlayer();
+    }
+
     // Zpracování AI tahu
     IEnumerator ProcessAITurn(Player aiPlayer)
     {

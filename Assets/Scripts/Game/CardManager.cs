@@ -319,6 +319,8 @@ public class CardManager : MonoBehaviour
         {
             count = rules.PendingDrawCount;
             rules.ClearDrawPenalty();
+            // Seven effect: show "+N" in the drawing player's bar.
+            PlayerEffectDisplay.Instance?.ShowDraw(player, count);
         }
 
         Card last = null;

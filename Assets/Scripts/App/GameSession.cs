@@ -173,21 +173,12 @@ public class GameSession : MonoBehaviour
         return -1;
     }
 
-    /// Aktivuje dalšího hráče v pořadí. Honours an Ace skip from the rule context.
+    /// Aktivuje dalšího hráče v pořadí. Ace skip se NEkonzumuje tady — řeší ho
+    /// GameplayState, aby přeskočený hráč nejdřív krátce „stál" s hláškou v UI.
     public void ActivateNextPlayer()
     {
         int nextIndex = NextPlayableAfter(ActiveIndex);
-
-        if (Rules != null && Rules.SkipNextPlayer && nextIndex >= 0)
-        {
-            Rules.SkipNextPlayer = false;
-            nextIndex = NextPlayableAfter(nextIndex);
-        }
-
-        if (nextIndex >= 0)
-        {
-            SetActiveIndex(nextIndex);
-        }
+        if (nextIndex >= 0) SetActiveIndex(nextIndex);
     }
 
     // === interní pomocné metody ===
