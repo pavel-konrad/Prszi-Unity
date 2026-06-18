@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Animations; // Pro AnimatorControllerParameterType
+using UnityEngine.Animations; // For AnimatorControllerParameterType
 
 public class PlayerHand : MonoBehaviour
 {
@@ -11,47 +11,47 @@ public class PlayerHand : MonoBehaviour
     public GameObject cardPrefab;
     
     [Header("Animation")]
-    public Animator handAnimator; // Animator pro animace rozdávání
+    public Animator handAnimator; // Animator for deal animations
     
     [Header("Player Reference")]
     public PlayerUI playerUI;
     
     private CardManager cardManager;
     private bool isInitialized = false;
-    private List<CardUI> cardUIs = new List<CardUI>(); // Seznam všech CardUI komponent
+    private List<CardUI> cardUIs = new List<CardUI>(); // List of all CardUI components
     
     void Awake()
     {
-        // Kontrola, zda máme potřebné reference
+        // Check that required references are set
         if (cardContainer == null)
         {
-            Debug.LogError("[PlayerHand] CardContainer není nastaven!");
+            Debug.LogError("[PlayerHand] CardContainer is not set!");
             return;
         }
         
         if (cardPrefab == null)
         {
-            Debug.LogError("[PlayerHand] CardPrefab není nastaven!");
+            Debug.LogError("[PlayerHand] CardPrefab is not set!");
             return;
         }
     }
     
     void Start()
     {
-        // Najít CardManager
+        // Find CardManager
         cardManager = Object.FindFirstObjectByType<CardManager>();
         
-        // Přihlásit se k událostem změny hráče
+        // Subscribe to player-changed events
         if (GameSession.I.Human != null)
         {
             GameSession.I.Human.Changed += OnPlayerChanged;
         }
         else
         {
-            Debug.LogError("[PlayerHand] GameSession.I.Human je null!");
+            Debug.LogError("[PlayerHand] GameSession.I.Human is null!");
         }
         
-        // Přihlásit se k události vítěze
+        // Subscribe to winner event
         if (cardManager != null)
         {
             cardManager.OnPlayerWon += OnPlayerWon;
@@ -64,13 +64,13 @@ public class PlayerHand : MonoBehaviour
         
         isInitialized = true;
         
-        // Aktualizovat UI v příštím frame, až bude vše inicializováno
+        // Update UI next frame once everything is initialised
         StartCoroutine(UpdateHandNextFrame());
     }
     
     System.Collections.IEnumerator UpdateHandNextFrame()
     {
-        yield return null; // Počkat na příští frame
+        yield return null; // Wait for next frame
         if (GameSession.I.Human != null)
         {
             UpdateHand(GameSession.I.Human);
@@ -94,37 +94,37 @@ public class PlayerHand : MonoBehaviour
     {
         if (!isInitialized) return;
         
-        // NESPOUŠTĚT UpdateHand() zde - to se spouští jen při rozdávání karet na začátku hry
-        // Pro nové karty se používá AddCardToHand()
+        // Do NOT call UpdateHand() here — only runs when dealing cards at game start
+        // AddCardToHand() is used for new cards
         
     }
     
-    // Spustit animaci rozdávání (volané z DealingState)
+    // Start dealing animation (called from DealingState)
     public void StartDealingAnimation()
     {
         if (handAnimator != null)
         {
             handAnimator.SetTrigger("DealCards");
-            // Zvuk se spustí přes Animation Event
+            // Sound plays via Animation Event
         }
     }
     
     void OnPlayerWon(Player winner)
     {
-        // Zde můžete přidat UI notifikaci o vítězi
+        // Add a UI winner notification here if desired
     }
     
     public void UpdateHand(Player player)
     {
         if (!isInitialized)
         {
-            Debug.LogError("[PlayerHand] UpdateHand volán před inicializací!");
+            Debug.LogError("[PlayerHand] UpdateHand called before initialisation!");
             return;
         }
         
         if (player == null)
         {
-            Debug.LogError("[PlayerHand] Player je null!");
+            Debug.LogError("[PlayerHand] Player is null!");
             return;
         }
         
@@ -144,9 +144,9 @@ public class PlayerHand : MonoBehaviour
             Destroy(child.gameObject);
         }
         
-        // Automaticky přizpůsobit mezery podle počtu karet
+        // Automatically adjust spacing based on card count
         float cardSpacing = CalculateCardSpacing(player.hand.Count);
-        float startX = -(player.hand.Count - 1) * cardSpacing * 0.5f; // Začít od středu
+        float startX = -(player.hand.Count - 1) * cardSpacing * 0.5f; // Start from centre
         
         for (int i = 0; i < player.hand.Count; i++)
         {
@@ -154,7 +154,7 @@ public class PlayerHand : MonoBehaviour
             
             GameObject cardObj = Instantiate(cardPrefab, cardContainer);
             
-            // Nastavit pozici karty
+            // Set card position
             RectTransform cardRect = cardObj.GetComponent<RectTransform>();
             if (cardRect != null)
             {
@@ -166,73 +166,73 @@ public class PlayerHand : MonoBehaviour
             var cardUI = cardObj.GetComponent<CardUI>();
             if (cardUI != null)
             {
-                // Zajistit, že má Animator
+                // Ensure it has Animator
                 Animator cardAnimator = cardObj.GetComponent<Animator>();
                 if (cardAnimator == null)
                 {
                     cardAnimator = cardObj.AddComponent<Animator>();
-                    Debug.LogWarning($"[PlayerHand] Animator nebyl nalezen na {card.rank} of {card.suit}, vytvářím nový");
+                    Debug.LogWarning($"[PlayerHand] Animator not found on {card.rank} of {card.suit}, creating a new one");
                 }
-                
+
                 if (cardAnimator.runtimeAnimatorController == null)
                 {
-                    Debug.LogWarning($"[PlayerHand] Animator na {card.rank} of {card.suit} nemá Animator Controller!");
+                    Debug.LogWarning($"[PlayerHand] Animator on {card.rank} of {card.suit} has no Animator Controller!");
                 }
                 
-                // Zajistit, že má AnimationEventReceiver
+                // Ensure it has AnimationEventReceiver
                 AnimationEventReceiver.EnsureComponent(cardObj);
                 
                 cardUI.SetCard(card);
                 
-                // NESPOUŠTĚT CardIn animaci zde - to se spouští jen na nově přidané karty
-                // CardIn animace se spouští v AddCardToHand() metodě
+                // Do NOT trigger CardIn animation here — only for newly added cards
+                // CardIn animation is triggered in AddCardToHand()
                 
-                // Přihlásit se k událostem
+                // Subscribe to events
                 cardUI.OnCardSwipedUp += OnCardSwipedUp;
                 cardUI.OnCardCharged += OnCardCharged;
-                // Přidat do seznamu
+                // Add to list
                 cardUIs.Add(cardUI);
                 
             }
             else
             {
-                Debug.LogError("[PlayerHand] CardUI komponenta nebyla nalezena na prefabu!");
+                Debug.LogError("[PlayerHand] CardUI component not found on the prefab!");
             }
         }
     }
-    
-    // Automaticky vypočítat mezery mezi kartami podle počtu karet
+
+    // Automatically compute spacing between cards by count
     private float CalculateCardSpacing(int cardCount)
     {
-        if (cardCount <= 2) return 120f;     // 1-2 karty - velmi široké mezery
-        if (cardCount <= 3) return 100f;     // 3 karty - široké mezery
-        if (cardCount <= 5) return 80f;      // 4-5 karet - normální mezery
-        if (cardCount <= 8) return 60f;      // 6-8 karet - menší mezery
-        if (cardCount <= 12) return 45f;     // 9-12 karet - ještě menší mezery
-        return 35f;                          // 13+ karet - minimální mezery
+        if (cardCount <= 2) return 120f;     // 1-2 cards — very wide spacing
+        if (cardCount <= 3) return 100f;     // 3 cards — wide spacing
+        if (cardCount <= 5) return 80f;      // 4-5 cards — normal spacing
+        if (cardCount <= 8) return 60f;      // 6-8 cards — tighter spacing
+        if (cardCount <= 12) return 45f;     // 9-12 cards — even tighter spacing
+        return 35f;                          // 13+ cards — minimum spacing
     }
     
     void OnCardSwipedUp(Card card)
     {
-        // Kontrola, zda je hráč na tahu
+        // Check whether player is on turn
         if (GameSession.I.Human.IsActive && GameSession.I.Human.CanPlay)
         {
-            // Kontrola, zda lze kartu zahrát
+            // Check whether the card is playable
             if (cardManager != null && cardManager.CanPlayCard(card))
             {
                 
-                // Najít CardUI komponentu pro tuto kartu
+                // Find CardUI component for this card
                 CardUI swipedCardUI = cardUIs.Find(cui => cui.card == card);
                 if (swipedCardUI != null)
                 {
-                    // Přihlásit se k události dokončení animace
+                    // Subscribe to animation-complete event
                     System.Action<Card> onComplete = null;
                     onComplete = (completedCard) => {
                         if (completedCard == card)
                         {
-                            // Animace dokončena - hrát kartu
+                            // Animation complete — play card
                             cardManager.PlayCard(GameSession.I.Human, card);
-                            // Odhlásit se od události
+                            // Unsubscribe from event
                             swipedCardUI.OnCardSwipedUpComplete -= onComplete;
                         }
                     };
@@ -240,13 +240,13 @@ public class PlayerHand : MonoBehaviour
                 }
                 else
                 {
-                    // Fallback - hrát kartu okamžitě
+                    // Fallback — play card immediately
                     cardManager.PlayCard(GameSession.I.Human, card);
                 }
             }
             else
             {
-                // TODO: Zobrazit vizuální feedback (např. červený efekt)
+                // TODO: Show visual feedback (e.g. red effect)
             }
         }
     }
@@ -255,12 +255,12 @@ public class PlayerHand : MonoBehaviour
     
     void OnCardCharged(Card card)
     {
-        // Najít CardUI komponentu pro tuto kartu
+        // Find CardUI component for this card
         CardUI chargedCardUI = cardUIs.Find(cui => cui.card == card);
         if (chargedCardUI == null) return;
         
         
-        // Vybit všechny ostatní karty
+        // Discharge all other cards
         foreach (var cardUI in cardUIs)
         {
             if (cardUI != null && cardUI != chargedCardUI && cardUI.isCharged)
@@ -270,34 +270,34 @@ public class PlayerHand : MonoBehaviour
         }
     }
     
-    // Volané z Animation Event pro zvuk rozdávání karet
+    // Called from Animation Event for card-deal sound
     public void PlayDealSound()
     {
-        // Zvuk se spustí přes AnimationEventReceiver
-        // Tato metoda je volána z Animation Event
+        // Sound plays via AnimationEventReceiver
+        // This method is called from Animation Event
     }
     
-    // Přidat novou kartu do ruky s CardIn animací
+    // Add new card to hand with CardIn animation
     public void AddCardToHand(Card card)
     {
         if (card == null || cardPrefab == null || cardContainer == null) return;
         
         
-        // Vytvořit novou kartu
+        // Create a new card
         GameObject cardObj = Instantiate(cardPrefab, cardContainer);
         
-        // Nastavit pozici karty (přidat na konec)
+        // Set card position (append at end)
         RectTransform cardRect = cardObj.GetComponent<RectTransform>();
         if (cardRect != null)
         {
-            // Přepočítat pozice všech karet
+            // Recalculate positions of all cards
             float cardSpacing = CalculateCardSpacing(cardUIs.Count + 1);
             float startX = -(cardUIs.Count) * cardSpacing * 0.5f;
             
-            // Nastavit pozici nové karty
+            // Set new card position
             cardRect.anchoredPosition = new Vector2(startX + cardUIs.Count * cardSpacing, 0);
             
-            // Přepočítat pozice existujících karet
+            // Recalculate positions of existing cards
             for (int i = 0; i < cardUIs.Count; i++)
             {
                 if (cardUIs[i] != null)
@@ -312,23 +312,23 @@ public class PlayerHand : MonoBehaviour
         var cardUI = cardObj.GetComponent<CardUI>();
         if (cardUI != null)
         {
-            // Zajistit, že má Animator
+            // Ensure it has Animator
             Animator cardAnimator = cardObj.GetComponent<Animator>();
             if (cardAnimator == null)
             {
                 cardAnimator = cardObj.AddComponent<Animator>();
-                Debug.LogWarning($"[PlayerHand] Animator nebyl nalezen na {card.rank} of {card.suit}, vytvářím nový");
+                Debug.LogWarning($"[PlayerHand] Animator not found on {card.rank} of {card.suit}, creating a new one");
             }
-            
-            // Zajistit, že má AnimationEventReceiver
+
+            // Ensure it has AnimationEventReceiver
             AnimationEventReceiver.EnsureComponent(cardObj);
             
             cardUI.SetCard(card);
             
-            // SPUSTIT CardIn animaci pro nově přidanou kartu
+            // TRIGGER CardIn animation for newly added card
             if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
             {
-                // Zkontrolovat, jestli trigger existuje
+                // Check whether trigger exists
                 bool hasCardInTrigger = false;
                 foreach (var param in cardAnimator.parameters)
                 {
@@ -345,31 +345,31 @@ public class PlayerHand : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning($"[PlayerHand] CardIn trigger neexistuje pro {card.rank} of {card.suit}");
+                    Debug.LogWarning($"[PlayerHand] CardIn trigger does not exist for {card.rank} of {card.suit}");
                 }
             }
             
-            // Přihlásit se k událostem
+            // Subscribe to events
             cardUI.OnCardSwipedUp += OnCardSwipedUp;
             cardUI.OnCardCharged += OnCardCharged;
             
-            // Přidat do seznamu
+            // Add to list
             cardUIs.Add(cardUI);
             
         }
         else
         {
-            Debug.LogError("[PlayerHand] CardUI komponenta nebyla nalezena na prefabu!");
+            Debug.LogError("[PlayerHand] CardUI component not found on the prefab!");
         }
     }
     
-    // Odebrat kartu z ruky
+    // Remove card from hand
     public void RemoveCard(Card card)
     {
         if (card == null) return;
         
         
-        // Najít a odebrat CardUI komponentu
+        // Find and remove CardUI component
         CardUI cardUIToRemove = null;
         for (int i = 0; i < cardUIs.Count; i++)
         {
@@ -382,26 +382,26 @@ public class PlayerHand : MonoBehaviour
         
         if (cardUIToRemove != null)
         {
-            // Odebrat z UI
+            // Remove from UI
             cardUIs.Remove(cardUIToRemove);
             
-            // Zničit GameObject
+            // Destroy GameObject
             if (cardUIToRemove.gameObject != null)
             {
                 Destroy(cardUIToRemove.gameObject);
             }
             
-            // Přepočítat pozice zbývajících karet
+            // Recalculate positions of remaining cards
             RecalculateCardPositions();
             
         }
         else
         {
-            Debug.LogWarning($"[PlayerHand] Karta {card.rank} of {card.suit} nebyla nalezena v UI pro odebrání");
+            Debug.LogWarning($"[PlayerHand] Card {card.rank} of {card.suit} not found in UI for removal");
         }
     }
     
-    // Přepočítat pozice všech karet
+    // Recalculate positions of all cards
     private void RecalculateCardPositions()
     {
         if (cardUIs.Count == 0) return;

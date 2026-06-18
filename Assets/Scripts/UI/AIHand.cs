@@ -1,22 +1,22 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Animations; // Pro AnimatorControllerParameterType
+using UnityEngine.Animations; // For AnimatorControllerParameterType
 
 public class AIHand : MonoBehaviour
 {
     [Header("AI Hand Display")]
     public Transform cardContainer;
-    public GameObject cardBackPrefab; // Prefab pro zadní stranu karty
+    public GameObject cardBackPrefab; // Prefab for the card back
     
     [Header("Animation")]
-    public Animator handAnimator; // Animator pro animace rozdávání
+    public Animator handAnimator; // Animator for deal animations
     
     [Header("AI Player")]
     public Player aiPlayer;
     public PlayerUI playerUI;
     
     [Header("Card Stack Reference")]
-    public CardStack cardStack; // Reference na CardStack z CardManager
+    public CardStack cardStack; // Reference to CardStack from CardManager
     
     void Start()
     {
@@ -25,13 +25,13 @@ public class AIHand : MonoBehaviour
             playerUI.Bind(aiPlayer);
         }
         
-        // Přihlásit se k událostem změny hráče
+        // Subscribe to player-changed events
         if (aiPlayer != null)
         {
             aiPlayer.Changed += OnPlayerChanged;
         }
         
-        // Přihlásit se k událostem změny CardStack
+        // Subscribe to CardStack change events
         if (cardStack != null)
         {
             cardStack.OnCardsChanged += OnCardStackChanged;
@@ -58,7 +58,7 @@ public class AIHand : MonoBehaviour
     
     void OnCardStackChanged()
     {
-        // Když se změní CardStack, aktualizovat UI
+        // When CardStack changes, update UI
         if (aiPlayer != null)
         {
             UpdateHand(aiPlayer);
@@ -70,20 +70,20 @@ public class AIHand : MonoBehaviour
         
         if (cardContainer == null)
         {
-            Debug.LogError($"[AIHand] {name} - CardContainer je null!");
+            Debug.LogError($"[AIHand] {name} - CardContainer is null!");
             return;
         }
         
         if (cardBackPrefab == null)
         {
-            Debug.LogError($"[AIHand] {name} - CardBackPrefab je null!");
+            Debug.LogError($"[AIHand] {name} - CardBackPrefab is null!");
             return;
         }
         
         // Clear existing cards
         int existingCards = cardContainer.childCount;
         
-        // Použít DestroyImmediate pro okamžité odstranění
+        // Use DestroyImmediate for immediate removal
         while (cardContainer.childCount > 0)
         {
             Transform child = cardContainer.GetChild(0);
@@ -91,7 +91,7 @@ public class AIHand : MonoBehaviour
         }
         
         
-        // Použít počet karet z CardStack, pokud je dostupný
+        // Use card count from CardStack when available
         int cardCount = player.hand.Count;
         if (cardStack != null)
         {
@@ -99,15 +99,15 @@ public class AIHand : MonoBehaviour
         }
         
         
-        // Automaticky přizpůsobit mezery podle počtu karet
+        // Automatically adjust spacing based on card count
         float cardSpacing = CalculateCardSpacing(cardCount);
-        float startX = -(cardCount - 1) * cardSpacing * 0.5f; // Začít od středu
+        float startX = -(cardCount - 1) * cardSpacing * 0.5f; // Start from centre
         
         for (int i = 0; i < cardCount; i++)
         {
             GameObject cardBackObj = Instantiate(cardBackPrefab, cardContainer);
             
-            // Nastavit pozici karty
+            // Set card position
             RectTransform cardRect = cardBackObj.GetComponent<RectTransform>();
             if (cardRect != null)
             {
@@ -115,7 +115,7 @@ public class AIHand : MonoBehaviour
                 cardRect.anchoredPosition = new Vector2(xPos, 0);
             }
             
-            // Nastavit sprite zadní strany karty
+            // Set card back sprite
             var cardBack = cardBackObj.GetComponent<CardBack>();
             if (cardBack != null && CardSpriteManager.Instance != null)
             {
@@ -123,37 +123,37 @@ public class AIHand : MonoBehaviour
                 cardBack.SetCardBackSprite(backSprite);
             }
             
-            // NESPOUŠTĚT CardIn animaci zde - to se spouští jen v AddCard() pro nově přidané karty
-            // UpdateHand se volá na všech kartách, ne jen na nových
+            // Do NOT trigger CardIn animation here — only AddCard() does for newly added cards
+            // UpdateHand is called on all cards, not just new ones
             
-            // Zajistit, že má AnimationEventReceiver
+            // Ensure it has AnimationEventReceiver
             AnimationEventReceiver.EnsureComponent(cardBackObj);
         }
         
     }
     
-    // Spustit animaci rozdávání (volané z DealingState)
+    // Start dealing animation (called from DealingState)
     public void StartDealingAnimation()
     {
         if (handAnimator != null)
         {
             handAnimator.SetTrigger("DealCards");
-            // Zvuk se spustí přes Animation Event
+            // Sound plays via Animation Event
         }
     }
     
-    // Automaticky vypočítat mezery mezi kartami podle počtu karet
+    // Automatically compute spacing between cards by count
     private float CalculateCardSpacing(int cardCount)
     {
-        if (cardCount <= 2) return 120f;     // 1-2 karty - velmi široké mezery
-        if (cardCount <= 3) return 100f;     // 3 karty - široké mezery
-        if (cardCount <= 5) return 80f;      // 4-5 karet - normální mezery
-        if (cardCount <= 8) return 60f;      // 6-8 karet - menší mezery
-        if (cardCount <= 12) return 45f;     // 9-12 karet - ještě menší mezery
-        return 35f;                          // 13+ karet - minimální mezery
+        if (cardCount <= 2) return 120f;     // 1-2 cards — very wide spacing
+        if (cardCount <= 3) return 100f;     // 3 cards — wide spacing
+        if (cardCount <= 5) return 80f;      // 4-5 cards — normal spacing
+        if (cardCount <= 8) return 60f;      // 6-8 cards — tighter spacing
+        if (cardCount <= 12) return 45f;     // 9-12 cards — even tighter spacing
+        return 35f;                          // 13+ cards — minimum spacing
     }
     
-    // Nastavit AI hráče
+    // Set AI player
     public void SetAIPlayer(Player player)
     {
         if (aiPlayer != null)
@@ -174,7 +174,7 @@ public class AIHand : MonoBehaviour
         }
     }
     
-    // Nastavit CardStack reference
+    // Set CardStack reference
     public void SetCardStack(CardStack stack)
     {
         if (cardStack != null)
@@ -190,33 +190,33 @@ public class AIHand : MonoBehaviour
         }
     }
     
-    // Volané z Animation Event pro zvuk rozdávání karet
+    // Called from Animation Event for card-deal sound
     public void PlayDealSound()
     {
-        // Zvuk se spustí přes AnimationEventReceiver
-        // Tato metoda je volána z Animation Event
+        // Sound plays via AnimationEventReceiver
+        // This method is called from Animation Event
     }
     
-    // Přidat novou kartu do AI ruky s CardIn animací
+    // Add new card to AI hand with CardIn animation
     public void AddCard(Card card)
     {
         if (card == null || cardBackPrefab == null || cardContainer == null) return;
         
-        // Vytvořit novou kartu (zadní strana)
+        // Create new card (back face)
         GameObject cardObj = Instantiate(cardBackPrefab, cardContainer);
         
-        // Nastavit pozici karty (přidat na konec)
+        // Set card position (append at end)
         RectTransform cardRect = cardObj.GetComponent<RectTransform>();
         if (cardRect != null)
         {
-            // Přepočítat pozice všech karet
-            float cardSpacing = 80f; // Fixní mezera pro AI karty
+            // Recalculate positions of all cards
+            float cardSpacing = 80f; // Fixed spacing for AI cards
             float startX = -(cardContainer.childCount - 1) * cardSpacing * 0.5f;
             
-            // Nastavit pozici nové karty
+            // Set new card position
             cardRect.anchoredPosition = new Vector2(startX + (cardContainer.childCount - 1) * cardSpacing, 0);
             
-            // Přepočítat pozice existujících karet
+            // Recalculate positions of existing cards
             for (int i = 0; i < cardContainer.childCount - 1; i++)
             {
                 Transform child = cardContainer.GetChild(i);
@@ -228,21 +228,21 @@ public class AIHand : MonoBehaviour
             }
         }
         
-        // Spustit CardIn animaci pro nově přidanou kartu
+        // Start CardIn animation for newly added card
         Animator cardAnimator = cardObj.GetComponent<Animator>();
         if (cardAnimator == null)
         {
             cardAnimator = cardObj.AddComponent<Animator>();
-            Debug.LogWarning($"[AIHand] Animator nebyl nalezen na nové kartě, vytvářím nový");
+            Debug.LogWarning($"[AIHand] Animator not found on the new card, creating a new one");
         }
         
-        // Zajistit, že má AnimationEventReceiver
+        // Ensure it has AnimationEventReceiver
         AnimationEventReceiver.EnsureComponent(cardObj);
         
-        // SPUSTIT CardIn animaci pro nově přidanou kartu
+        // TRIGGER CardIn animation for newly added card
         if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
         {
-            // Zkontrolovat, jestli trigger existuje
+            // Check whether trigger exists
             bool hasCardInTrigger = false;
             foreach (var param in cardAnimator.parameters)
             {
@@ -259,38 +259,38 @@ public class AIHand : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[AIHand] CardIn trigger neexistuje pro AI kartu {card.rank} of {card.suit}");
+                Debug.LogWarning($"[AIHand] CardIn trigger does not exist for AI card {card.rank} of {card.suit}");
             }
         }
         
     }
     
-    // Odebrat kartu z AI ruky
+    // Remove card from AI hand
     public void RemoveCard(Card card)
     {
         if (card == null || cardContainer == null) return;
         
         
-        // Najít a odebrat kartu z UI
+        // Find and remove card from UI
         for (int i = 0; i < cardContainer.childCount; i++)
         {
             Transform child = cardContainer.GetChild(i);
             if (child != null)
             {
-                // Zničit GameObject
+                // Destroy GameObject
                 Destroy(child.gameObject);
                 
-                // Přepočítat pozice zbývajících karet
+                // Recalculate positions of remaining cards
                 RecalculateCardPositions();
                 
                 return;
             }
         }
         
-        Debug.LogWarning($"[AIHand] {name} - Karta {card.rank} of {card.suit} nebyla nalezena v UI pro odebrání");
+        Debug.LogWarning($"[AIHand] {name} - Card {card.rank} of {card.suit} not found in UI for removal");
     }
     
-    // Přepočítat pozice všech karet
+    // Recalculate positions of all cards
     private void RecalculateCardPositions()
     {
         if (cardContainer == null || cardContainer.childCount == 0) return;

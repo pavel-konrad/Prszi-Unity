@@ -3,13 +3,13 @@ using Prsi.Core.Game;
 namespace Prsi.Core.Cards
 {
     /// <summary>
-    /// Běžná karta bez speciálního efektu
-    /// Hodnoty: 8, 9, 10, J (kluk), K (král)
+    /// Regular card with no special effect
+    /// Ranks: 8, 9, 10, J (Jack), K (King)
     /// 
-    /// Pravidla:
-    /// - Lze zahrát na kartu stejné barvy nebo hodnoty
-    /// - Respektuje vynucenou barvu po dámě
-    /// - Nemá žádný speciální efekt
+    /// Rules:
+    /// - May be played on a card of the same suit or rank
+    /// - Respects forced suit after a Queen
+    /// - Has no special effect
     /// </summary>
     public class RegularCard : BaseCard
     {
@@ -20,45 +20,45 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Běžná karta lze zahrát pokud:
-        /// 1. Souhlasí barva nebo hodnota s vrchní kartou
-        /// 2. Není aktivní vynucená barva, nebo souhlasí s vynucenou barvou
-        /// 3. Pokud je aktivní penalizace (sedmy), nelze zahrát běžnou kartu
+        /// Regular card may be played if:
+        /// 1. Suit or rank matches the top card
+        /// 2. No forced suit is active, or suit matches the forced suit
+        /// 3. If a draw penalty is active (Sevens), regular cards cannot be played
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
-            // Na čekající eso lze reagovat jen esem.
+            // Only an Ace may respond to a pending Ace.
             if (context?.AcePending == true)
             {
                 return false;
             }
 
-            // Pokud je aktivní penalizace líznutí, nelze zahrát běžnou kartu
+            // If a draw penalty is active, regular cards cannot be played
             if (context?.PendingDrawCount > 0)
             {
                 return false;
             }
 
-            // Pokud je vynucená barva (po dámě), musí souhlasit barva
+            // If a suit is forced (after a Queen), suit must match
             if (context?.ForcedSuit != null)
             {
                 return Suit == context.ForcedSuit.Value;
             }
 
-            // Standardní pravidlo: stejná barva nebo hodnota
+            // Standard rule: same suit or rank
             return MatchesSuitOrRank(topCard);
         }
         
         /// <summary>
-        /// Běžná karta nemá žádný speciální efekt
-        /// Pouze zruší vynucenou barvu (pokud byla aktivní)
+        /// Regular card has no special effect
+        /// Only clears forced suit (if it was active)
         /// </summary>
         public override void OnPlay(GameContext context, IPlayerData player)
         {
-            // Zrušit vynucenou barvu po dámě
+            // Clear forced suit after Queen
             context?.ClearForcedSuit();
             
-            // Notifikovat o zahrání karty
+            // Notify that the card was played
             context?.NotifyCardPlayed(this, player);
         }
     }

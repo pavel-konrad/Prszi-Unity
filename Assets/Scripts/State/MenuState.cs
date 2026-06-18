@@ -16,8 +16,8 @@ public class MenuState : IGameState
     public void Tick(float dt){}
 
     async void OnStart(){
-        // Zvuk se spustí přes Animation Event v MainMenu animaci
-        // AudioEvents.TriggerGameStart() se volá z AnimationEventReceiver
+        // Sound plays via Animation Event v MainMenu animaci
+        // AudioEvents.TriggerGameStart() is called from AnimationEventReceiver
         await Task.Delay(2000);
         _intro.SetActive(false); 
         _game.SetActive(true); 

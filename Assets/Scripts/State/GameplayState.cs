@@ -8,7 +8,7 @@ public class GameplayState : IGameState
     readonly GameStateMachine _fsm;
     
     private CardManager cardManager;
-    private float aiThinkTime = 2.0f; // Čas na rozmyšlení pro AI
+    private float aiThinkTime = 2.0f; // Think time for AI
     
     public GameplayState(MonoBehaviour runner)
     {
@@ -24,25 +24,25 @@ public class GameplayState : IGameState
             var player = GameSession.I.Players[i];
         }
         
-        // Najít CardManager
+        // Find CardManager
         cardManager = Object.FindFirstObjectByType<CardManager>();
         if (cardManager == null)
         {
-            Debug.LogError("[GameplayState] CardManager nebyl nalezen!");
+            Debug.LogError("[GameplayState] CardManager not found!");
             return;
         }
         
-        // Přihlásit se k událostem
+        // Subscribe to events
         cardManager.OnPlayerWon += OnPlayerWon;
         GameSession.I.ActivePlayerChanged += OnActivePlayerChanged;
         
-        // Zkontrolovat, zda je aktivní hráč AI, a pokud ano, spustit AI tah
+        // Check if active player is AI; if so, start AI turn
         CheckActivePlayer();
     }
     
     public void Exit()
     {
-        // Odhlásit se od událostí
+        // Unsubscribe from events
         if (cardManager != null)
         {
             cardManager.OnPlayerWon -= OnPlayerWon;
@@ -56,18 +56,18 @@ public class GameplayState : IGameState
     
     public void Tick(float dt)
     {
-        // V tomto stavu není potřeba tick logika
+        // No tick logic needed in this state
     }
     
-    // Zkontroluje aktivního hráče a spustí AI pokud je to AI hráč
+    // Checks active player and starts AI if it is an AI player
     void CheckActivePlayer()
     {
         var activePlayer = GameSession.I.ActiveIndex >= 0 && GameSession.I.ActiveIndex < GameSession.I.Players.Count
             ? GameSession.I.Players[GameSession.I.ActiveIndex]
             : null;
 
-        // Eso efekt: na vrchu je eso. Kdo nemá vlastní eso na obranu, automaticky
-        // „stojí" (přeskočí, NElíže). Kdo eso má, hraje normálně (může přebít).
+        // Ace effect: an Ace is on top. Anyone without their own Ace to defend automatically
+        // "stands" (skipped, does NOT draw). Anyone with an Ace plays normally (may counter).
         if (activePlayer != null && GameSession.I.Rules != null
             && GameSession.I.Rules.AcePending && !HasAce(activePlayer))
         {
@@ -82,19 +82,19 @@ public class GameplayState : IGameState
         }
         else if (activePlayer != null && activePlayer.IsHuman)
         {
-            // Human hráč hraje přes UI - nic dalšího nedělat
-            // Tah se zastaví zde a čeká na UI interakci
+            // Human player plays via UI — nothing else to do
+            // Turn stops here and waits for UI interaction
         }
         else if (activePlayer == null || !activePlayer.CanPlay)
         {
-            Debug.LogWarning($"[GameplayState] Aktivní hráč nemůže hrát nebo neexistuje: activePlayer={activePlayer?.Name ?? "null"}, CanPlay={activePlayer?.CanPlay}");
-            // Pokračovat na dalšího hráče
+            Debug.LogWarning($"[GameplayState] Active player cannot play or does not exist: activePlayer={activePlayer?.Name ?? "null"}, CanPlay={activePlayer?.CanPlay}");
+            // Continue to next player
             GameSession.I.ActivateNextPlayer();
-            // NEREKURZIVNĚ - nevolat CheckActivePlayer() zde
+            // NON-RECURSIVE — do not call CheckActivePlayer() here
         }
     }
     
-    // Má hráč v ruce eso (na obranu proti čekajícímu esu)?
+    // Does the player have an Ace in hand (to defend against a pending Ace)?
     bool HasAce(Player player)
     {
         foreach (Card c in player.hand)
@@ -102,7 +102,7 @@ public class GameplayState : IGameState
         return false;
     }
 
-    // Eso efekt: přeskočený hráč krátce „stojí" (hláška v UI), pak se předá tah dál.
+    // Ace effect: skipped player briefly "stands" (UI message), then turn passes on.
     IEnumerator SkipTurn(Player player)
     {
         GameLog.Record("STAND", player.Name);
@@ -112,42 +112,42 @@ public class GameplayState : IGameState
         GameSession.I.ActivateNextPlayer();
     }
 
-    // Zpracování AI tahu
+    // AI turn processing
     IEnumerator ProcessAITurn(Player aiPlayer)
     {
-        // Počkat na rozmyšlení AI
+        // Wait for AI to think
         yield return new WaitForSeconds(aiThinkTime);
         
-        // Získat vrchní kartu z odhazovacího balíčku
+        // Get top card from discard pile
         Card topCard = GetTopDiscardCard();
         if (topCard == null)
         {
-            Debug.LogError("[GameplayState] Nelze získat vrchní kartu z discard pile!");
+            Debug.LogError("[GameplayState] Cannot get the top card from the discard pile!");
             yield break;
         }
         
-        // Najít platnou kartu v ruce AI
+        // Find valid card in AI hand
         Card playableCard = FindPlayableCard(aiPlayer, topCard);
         
         if (playableCard != null)
         {
-            // AI může hrát kartu
+            // AI can play a card
             cardManager.PlayCard(aiPlayer, playableCard);
         }
         else
         {
-            // AI nemá platnou kartu - musí si líznout
-            cardManager.DrawCardForPlayer(aiPlayer); // Použít synchronní metodu pro AI
+            // AI has no valid card — must draw
+            cardManager.DrawCardForPlayer(aiPlayer); // Use synchronous method for AI
             
-            // V Prší: po líznutí karty automaticky končí tah, i když je karta hratelná
+            // In Prší: after drawing, turn ends automatically even if the drawn card is playable
             yield return new WaitForSeconds(0.5f);
             
             GameSession.I.ActivateNextPlayer();
-            // NEREKURZIVNĚ - OnActivePlayerChanged se postará o CheckActivePlayer()
+            // NON-RECURSIVE — OnActivePlayerChanged will call CheckActivePlayer()
         }
     }
     
-    // Najde hratelnou kartu v ruce hráče
+    // Finds a playable card in the player's hand
     Card FindPlayableCard(Player player, Card topCard)
     {
         foreach (Card card in player.hand)
@@ -168,7 +168,7 @@ public class GameplayState : IGameState
         return Prsi.Core.Cards.CardRules.CanPlay(cardToPlay, topCard, GameSession.I.Rules);
     }
     
-    // Získá vrchní kartu z odhazovacího balíčku
+    // Gets top card from discard pile
     Card GetTopDiscardCard()
     {
         if (cardManager?.discard?.cards != null && cardManager.discard.cards.Count > 0)
@@ -178,20 +178,20 @@ public class GameplayState : IGameState
         return null;
     }
     
-    // Volá se když se změní aktivní hráč
+    // Called when the active player changes
     void OnActivePlayerChanged(Player activePlayer, int activeIndex)
     {
-        // Zkontrolovat nového aktivního hráče
+        // Check the new active player
         CheckActivePlayer();
     }
     
-    // Volá se když hráč vyhraje kolo → vyhodnocení kola (RoundEndState v Phase C).
+    // Called when a player wins the round → round evaluation (RoundEndState in Phase C).
     void OnPlayerWon(Player winner)
     {
         _fsm.Go<RoundEndState>();
     }
     
-    // Veřejná metoda pro validaci karty (volá se z UI)
+    // Public method for card validation (called from UI)
     public bool CanPlayCard(Card cardToPlay)
     {
         Card topCard = GetTopDiscardCard();

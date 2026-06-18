@@ -7,11 +7,11 @@ using Prsi.Core.Game;
 namespace Prsi.Tests.EditMode
 {
     /// <summary>
-    /// SPEC S4 (pořadí tahů) a S5.1 (vítěz) — logika GameContextu.
+    /// SPEC S4 (turn order) and S5.1 (winner) — GameContext logic.
     /// </summary>
     public class GameFlowTests
     {
-        /// <summary>Minimální fake hráče — GameContext potřebuje jen seznam IPlayerData.</summary>
+        /// <summary>Minimal fake player — GameContext only needs a list of IPlayerData.</summary>
         private sealed class TestPlayer : IPlayerData
         {
             public TestPlayer(int id) { Id = id; }
@@ -34,7 +34,7 @@ namespace Prsi.Tests.EditMode
             return new GameContext(players);
         }
 
-        [Test] // S4.1 — normálně posun o 1
+        [Test] // S4.1 — normal advance by 1
         public void Advance_MovesToNextPlayer()
         {
             var ctx = CtxWith(3);
@@ -43,7 +43,7 @@ namespace Prsi.Tests.EditMode
             Assert.AreEqual(1, ctx.CurrentPlayerIndex);
         }
 
-        [Test] // S4.1 — normální posun wrapuje
+        [Test] // S4.1 — normal advance wraps around
         public void Advance_WrapsAroundEnd()
         {
             var ctx = CtxWith(3);
@@ -52,7 +52,7 @@ namespace Prsi.Tests.EditMode
             Assert.AreEqual(0, ctx.CurrentPlayerIndex); // (2+1)%3
         }
 
-        [Test] // S5.1 — SetWinner nastaví stav a vystřelí událost
+        [Test] // S5.1 — SetWinner sets state and fires event
         public void SetWinner_SetsStateAndFiresEvent()
         {
             var ctx = CtxWith(2);

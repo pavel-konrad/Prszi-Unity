@@ -17,9 +17,9 @@ public class Player : IPlayerData, ITournamentPlayer
 
     public int Cash = 1000;
 
-    // Nové properties pro karty
+    // New properties for cards
     public List<Card> hand = new List<Card>();
-    public bool hasFolded = false; // V prší: true = hráč už nemá karty (vyhrál)
+    public bool hasFolded = false; // In Prší: true = player has no cards left (won)
 
     bool isActive;
     public bool IsActive {
@@ -57,9 +57,9 @@ public class Player : IPlayerData, ITournamentPlayer
         Changed?.Invoke(this);
     }
     
-    // === Metody pro práci s kartami ===
+    // === Card-hand methods ===
     
-    /// Přidá kartu do ruky hráče
+    /// Adds a card to the player's hand
     public void AddCard(Card card)
     {
         if (card != null)
@@ -69,14 +69,14 @@ public class Player : IPlayerData, ITournamentPlayer
         }
     }
     
-    /// Odebere kartu z ruky hráče
+    /// Removes a card from the player's hand
     public void RemoveCard(Card card)
     {
         if (hand.Remove(card))
         {
             Changed?.Invoke(this);
             
-            // Kontrola, zda hráč vyhrál
+            // Check whether the player won
             if (hand.Count == 0)
             {
                 SetWon();
@@ -84,7 +84,7 @@ public class Player : IPlayerData, ITournamentPlayer
         }
     }
     
-    /// Vyčistí všechny karty z ruky
+    /// Clears all cards from the hand
     public void ClearHand()
     {
         if (hand.Count > 0)
@@ -95,20 +95,20 @@ public class Player : IPlayerData, ITournamentPlayer
         }
     }
     
-    /// Označí hráče jako vítěze
+    /// Marks the player as winner
     public void SetWon()
     {
-        hasFolded = true; // hasFolded = vyhrál
+        hasFolded = true; // hasFolded = won
         Changed?.Invoke(this);
     }
     
-    /// Zkontroluje zda hráč vyhrál (nemá žádné karty)
+    /// Checks whether the player won (has no cards)
     public bool HasWon => hand.Count == 0 || hasFolded;
     
-    /// Zkontroluje zda hráč může hrát (je ve hře a není folded)
+    /// Checks whether the player can play (in game and not folded)
     public bool CanPlay => !hasFolded && hand.Count > 0;
     
-    /// Zkontroluje zda je hráč stále ve hře
+    /// Checks whether the player is still in the game
     public bool IsInGame => !hasFolded;
 
     // === Prsi.Core bridge (explicit interface implementations) ===

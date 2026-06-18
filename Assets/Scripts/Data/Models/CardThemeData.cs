@@ -4,7 +4,7 @@ using Prsi.Core.Cards;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Data pro jedno téma karet
+    /// Data for a single card theme
     /// </summary>
     [System.Serializable]
     public class CardThemeData
@@ -14,8 +14,8 @@ namespace Prsi.Data
         public string displayName;
         
         [Header("Card Sprites")]
-        [Tooltip("Sprites pro karty v pořadí: Hearts(7,8,9,10,J,Q,K,A), Diamonds(7,8,9,10,J,Q,K,A), Clubs(7,8,9,10,J,Q,K,A), Spades(7,8,9,10,J,Q,K,A)")]
-        public Sprite[] cardSprites = new Sprite[32]; // 4 barvy × 8 hodnot
+        [Tooltip("Sprites for cards in order: Hearts(7,8,9,10,J,Q,K,A), Diamonds(7,8,9,10,J,Q,K,A), Clubs(7,8,9,10,J,Q,K,A), Spades(7,8,9,10,J,Q,K,A)")]
+        public Sprite[] cardSprites = new Sprite[32]; // 4 suits × 8 ranks
         
         [Header("Card Back")]
         public Sprite cardBackSprite;
@@ -34,7 +34,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Získá sprite pro kartu podle barvy a hodnoty
+        /// Gets the sprite for a card by suit and rank
         /// </summary>
         public Sprite GetCardSprite(Suit suit, Rank rank)
         {

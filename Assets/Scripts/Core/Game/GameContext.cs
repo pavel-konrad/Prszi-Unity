@@ -23,19 +23,19 @@ namespace Prsi.Core.Game
         // === Special Card Effects ===
 
         /// <summary>
-        /// Eso efekt: na vrchu je eso, další hráč musí přebít vlastním esem,
-        /// nebo stojí (přeskočí tah) — ale NELÍZNE. True dokud někdo nestojí.
+        /// Ace effect: an Ace is on top; the next player must counter with their own Ace,
+        /// or stands (skips turn) — but does NOT draw. True until someone stands.
         /// </summary>
         public bool AcePending { get; set; }
 
         /// <summary>
-        /// Počet karet k líznutí (efekt sedmy, kumulativní)
+        /// Number of cards to draw (Seven effect, cumulative)
         /// </summary>
         public int PendingDrawCount { get; set; }
         
         /// <summary>
-        /// Vynucená barva (efekt dámy)
-        /// Null = žádná vynucená barva
+        /// Forced suit (Queen effect)
+        /// Null = no forced suit
         /// </summary>
         public Suit? ForcedSuit { get; set; }
         
@@ -60,7 +60,7 @@ namespace Prsi.Core.Game
         // === Helper Methods ===
         
         /// <summary>
-        /// Posune na dalšího hráče v pořadí.
+        /// Advances to the next player in order.
         /// </summary>
         public void AdvanceToNextPlayer()
         {
@@ -68,7 +68,7 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Vyvolá událost změny barvy
+        /// Raises suit-changed event
         /// </summary>
         public void NotifySuitChanged(Suit suit)
         {
@@ -77,7 +77,7 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Vyvolá událost penalizace líznutí
+        /// Raises draw-penalty event
         /// </summary>
         public void NotifyDrawPenalty(int count)
         {
@@ -86,7 +86,7 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Vyvolá událost odehrání karty
+        /// Raises card-played event
         /// </summary>
         public void NotifyCardPlayed(ICardData card, IPlayerData player)
         {
@@ -94,7 +94,7 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Vyvolá událost líznutí karty
+        /// Raises card-drawn event
         /// </summary>
         public void NotifyCardDrawn(ICardData card, IPlayerData player)
         {
@@ -102,7 +102,7 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Nastaví vítěze a ukončí hru
+        /// Sets the winner and ends the game
         /// </summary>
         public void SetWinner(IPlayerData player)
         {
@@ -112,8 +112,8 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Resetuje efekty karet (vynucenou barvu)
-        /// Volá se po odehrání běžné karty
+        /// Resets card effects (forced suit)
+        /// Called after a regular card is played
         /// </summary>
         public void ClearForcedSuit()
         {
@@ -123,8 +123,8 @@ namespace Prsi.Core.Game
         }
         
         /// <summary>
-        /// Resetuje penalizaci líznutí
-        /// Volá se po líznutí karet nebo odehrání sedmy
+        /// Resets draw penalty
+        /// Called after drawing cards or playing a Seven
         /// </summary>
         public void ClearDrawPenalty()
         {

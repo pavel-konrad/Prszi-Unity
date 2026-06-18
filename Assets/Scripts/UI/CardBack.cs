@@ -6,7 +6,7 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
 {
     [Header("Card Back Display")]
     public Image cardBackImage;
-    public Sprite cardBackSprite; // Sprite pro zadní stranu karty
+    public Sprite cardBackSprite; // Sprite for card back
     
     void Awake()
     {
@@ -16,7 +16,7 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
     
     void Start()
     {
-        // Zkusit načíst sprite z CardSpriteManager
+        // Try loading sprite from CardSpriteManager
         if (cardBackSprite == null && CardSpriteManager.Instance != null)
         {
             cardBackSprite = CardSpriteManager.Instance.GetCardBackSprite();
@@ -33,25 +33,25 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
         }
     }
     
-    // Nastavit sprite pro zadní stranu
+    // Set sprite for card back
     public void SetCardBackSprite(Sprite sprite)
     {
         cardBackSprite = sprite;
         UpdateDisplay();
     }
     
-    // Implementace IPointerClickHandler pro kliknutí na balíček
+    // IPointerClickHandler implementation for clicking the deck
     public void OnPointerClick(PointerEventData eventData)
     {
         
-        // Zkontrolovat, zda je human hráč na tahu
+        // Check whether the human player is on turn
         var human = GameSession.I.Human;
         if (human == null || !human.IsActive || !human.CanPlay)
         {
             return;
         }
         
-        // Eso efekt: na čekající eso se NElíže — klik na balíček = „stůj" (přeskok).
+        // Ace effect: do NOT draw on pending Ace — clicking the deck = "stand" (skip).
         var rules = GameSession.I.Rules;
         if (rules != null && rules.AcePending)
         {
@@ -60,29 +60,29 @@ public class CardBack : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        // Najít CardManager
+        // Find CardManager
         CardManager cardManager = FindObjectOfType<CardManager>();
         if (cardManager == null)
         {
-            Debug.LogError("[CardBack] CardManager nebyl nalezen!");
+            Debug.LogError("[CardBack] CardManager not found!");
             return;
         }
 
 
-        // V Prší si hráč může líznout kartu i když má hratelnou kartu
+        // In Prší the player may draw even when they have a playable card
 
-        // Líznout kartu
+        // Draw a card
         Card drawnCard = cardManager.DrawCardForPlayer(human);
         
         // Exhausted deck and discard is a legal late-game state, not a bug.
         if (drawnCard == null)
-            Debug.LogWarning("[CardBack] Žádná karta k líznutí (balíček i odhazovací prázdné), předávám tah");
+            Debug.LogWarning("[CardBack] No card to draw (deck and discard empty), passing turn");
 
         // In Prší drawing ends the turn — pass even if no card could be drawn.
         GameSession.I.ActivateNextPlayer();
     }
 
-    // Human „stojí" na eso: krátká hláška v jeho baru, pak předá tah.
+    // Human "stands" on Ace: short message in their bar, then pass turn.
     System.Collections.IEnumerator StandThenPass(Player human)
     {
         GameLog.Record("STAND", human.Name);

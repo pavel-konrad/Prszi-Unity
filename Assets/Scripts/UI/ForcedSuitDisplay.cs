@@ -4,7 +4,7 @@ using Prsi.Core.Cards;
 using Prsi.Core.Game;
 
 /// <summary>
-/// Shows the forced suit ("barva tahu") on the bar of the player who played the
+/// Shows the forced suit on the bar of the player who played the
 /// Queen. The whole indicator (frame + symbol) is hidden by default and shown only
 /// while a forced suit is active. Passive view driven by the shared GameContext.
 ///

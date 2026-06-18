@@ -11,7 +11,7 @@ public class DiscardPile : MonoBehaviour
     public TextMeshProUGUI suitText;
     
     [Header("Animation")]
-    public Animator cardAnimator; // Animator pro animace karet
+    public Animator cardAnimator; // Animator for card animations
     
     [Header("Card Stack Reference")]
     public CardStack discardStack;
@@ -20,7 +20,7 @@ public class DiscardPile : MonoBehaviour
     
     void Start()
     {
-        // Najít CardManager a jeho discard stack
+        // Find CardManager and its discard stack
         if (discardStack == null)
         {
             CardManager cardManager = FindObjectOfType<CardManager>();
@@ -30,7 +30,7 @@ public class DiscardPile : MonoBehaviour
             }
         }
         
-        // Přihlásit se k událostem změny discard stacku
+        // Subscribe to discard-stack-changed events
         if (discardStack != null)
         {
             discardStack.OnCardsChanged += OnDiscardChanged;
@@ -38,7 +38,7 @@ public class DiscardPile : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[DiscardPile] Discard stack nebyl nalezen!");
+            Debug.LogError("[DiscardPile] Discard stack not found!");
         }
     }
     
@@ -59,7 +59,7 @@ public class DiscardPile : MonoBehaviour
     {
         if (discardStack == null || discardStack.Count == 0)
         {
-            // Prázdný discard pile - skrýt kartu
+            // Empty discard pile — hide card
             if (cardImage != null) cardImage.enabled = false;
             if (cardText != null) cardText.text = "";
             if (valueText != null) valueText.text = "";
@@ -68,31 +68,31 @@ public class DiscardPile : MonoBehaviour
             return;
         }
         
-        // Zobrazit vrchní kartu
+        // Show top card
         Card topCard = discardStack.cards[discardStack.cards.Count - 1];
-        if (topCard == currentTopCard) return; // Stejná karta, není potřeba aktualizovat
+        if (topCard == currentTopCard) return; // Same card, no update needed
         
         currentTopCard = topCard;
         
         
-        // Spustit animaci příchodu karty
+        // Start card-arrival animation
         if (cardAnimator != null)
         {
             cardAnimator.SetTrigger("CardIn");
-            // Zvuk se spustí přes Animation Event
+            // Sound plays via Animation Event
         }
         else
         {
-            // Pokud nemáme animátor, nastavit obsah karty přímo
+            // If no animator, set card content directly
             SetCardContent(topCard);
         }
     }
     
-    // Nastavit obsah karty (bez animace)
+    // Set card content (no animation)
     private void SetCardContent(Card card)
     {
         
-        // Nastavit sprite karty
+        // Set card sprite
         if (cardImage != null)
         {
             cardImage.enabled = true;
@@ -102,34 +102,34 @@ public class DiscardPile : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[DiscardPile] Karta nemá sprite!");
+                Debug.LogWarning("[DiscardPile] Card has no sprite!");
             }
         }
         else
         {
-            Debug.LogError("[DiscardPile] cardImage je null!");
+            Debug.LogError("[DiscardPile] cardImage is null!");
         }
         
-        // Nastavit text karty (fallback pokud nemáme sprite)
+        // Set card text (fallback when no sprite)
         if (cardText != null)
         {
             cardText.text = $"{card.rank}\n{card.suit}";
         }
         
-        // Nastavit value text
+        // Set value text
         if (valueText != null)
         {
             valueText.text = card.rank.ToString();
         }
         
-        // Nastavit suit text
+        // Set suit text
         if (suitText != null)
         {
             suitText.text = card.suit.ToString();
         }
     }
     
-    // Volané z Animation Event pro nastavení obsahu karty během animace
+    // Called from Animation Event to set card content during animation
     public void SetCurrentCardContent()
     {
         if (currentTopCard != null)
@@ -138,10 +138,10 @@ public class DiscardPile : MonoBehaviour
         }
     }
     
-    // Volané z Animation Event pro zvuk otočení karty
+    // Called from Animation Event for card-flip sound
     public void PlayCardFlipSound()
     {
-        // Zvuk se spustí přes AnimationEventReceiver
-        // Tato metoda je volána z Animation Event
+        // Sound plays via AnimationEventReceiver
+        // This method is called from Animation Event
     }
 }

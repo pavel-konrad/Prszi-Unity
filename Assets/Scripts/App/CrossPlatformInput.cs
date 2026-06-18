@@ -2,21 +2,21 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Komponenta pro cross-platform input pomocí Unity Input System.
-/// Automaticky podporuje mouse (web/desktop) i touch (mobil).
+/// Component for cross-platform input using Unity Input System.
+/// Automatically supports mouse (web/desktop) and touch (mobile).
 /// 
-/// VÝHODY Unity Input System:
-/// - Automatická detekce platformy
-/// - Lepší performance
-/// - Moderní API
-/// - Snadné přidávání nových inputů
-/// - Built-in support pro gamepady, klávesnice, atd.
+/// BENEFITS of Unity Input System:
+/// - Automatic platform detection
+/// - Better performance
+/// - Modern API
+/// - Easy to add new inputs
+/// - Built-in support for gamepads, keyboard, etc.
 /// </summary>
 public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
 {
     [Header("Settings")]
-    public bool enableHapticFeedback = true; // Vibrace na mobilu
-    public bool enableVisualFeedback = true; // Vizuální feedback
+    public bool enableHapticFeedback = true; // Vibration on mobile
+    public bool enableVisualFeedback = true; // Visual feedback
 
     private GameInputActions inputActions;
     private bool isMobilePlatform;
@@ -41,7 +41,7 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
     
     void OnDisable()
     {
-        // Zakázat input actions
+        // Disable input actions
         inputActions.Disable();
     }
     
@@ -74,7 +74,7 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
             
             UIEvents.TriggerScreenPressed(position);
             
-            // Haptic feedback na mobilu
+            // Haptic feedback on mobile
             if (isMobilePlatform && enableHapticFeedback)
             {
                 Handheld.Vibrate();
@@ -92,14 +92,14 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
     
     public void OnPosition(InputAction.CallbackContext context)
     {
-        // Position se automaticky aktualizuje při každém input eventu
+        // Position is updated automatically on every input event
         if (context.performed)
         {
             lastInputPosition = context.ReadValue<Vector2>();
         }
     }
     
-    // Veřejné metody pro programové ovládání
+    // Public methods for programmatic control
     public void SimulateTap(Vector2 position)
     {
         UIEvents.TriggerScreenTapped(position);
@@ -115,7 +115,7 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
         UIEvents.TriggerScreenReleased(position);
     }
     
-    // Utility metody
+    // Utility methods
     public bool IsMobilePlatform()
     {
         return isMobilePlatform;
@@ -131,7 +131,7 @@ public class CrossPlatformInput : MonoBehaviour, GameInputActions.IPlayerActions
         return inputActions;
     }
     
-    // Metody pro kontrolu stavu inputů
+    // Methods for checking input state
     public bool IsPressed()
     {
         return inputActions.Player.Press.IsPressed();

@@ -73,6 +73,6 @@ public static class GameLog
     {
         string path = Path.Combine(Application.persistentDataPath, "prsi_log.json");
         File.WriteAllText(path, JsonUtility.ToJson(_log, true));
-        Debug.Log($"[GameLog] {_log.entries.Count} záznamů → {path}");
+        Debug.Log($"[GameLog] {_log.entries.Count} entries → {path}");
     }
 }

@@ -3,45 +3,45 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections;
-using UnityEngine.Animations; // Pro AnimatorControllerParameterType
+using UnityEngine.Animations; // For AnimatorControllerParameterType
 
 public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Card Display")]
     public Image cardImage;
     public TextMeshProUGUI cardText;
-    public TextMeshProUGUI valueText; // Pro hodnotu karty (7, 8, 9, 10, J, Q, K, A)
-    public TextMeshProUGUI suitText;  // Pro barvu karty (Hearts, Diamonds, Clubs, Spades)
+    public TextMeshProUGUI valueText; // For card value (7, 8, 9, 10, J, Q, K, A)
+    public TextMeshProUGUI suitText;  // For card suit (Hearts, Diamonds, Clubs, Spades)
     
     [Header("Card Data")]
     public Card card;
     
     [Header("Animation")]
-    public Animator cardAnimator; // Animator pro animace karty
+    public Animator cardAnimator; // Animator for card animations
     
     [Header("Interaction")]
-    public bool isInteractable = true; // Můžeme kartu hrát?
-    public bool isCharged = false; // Je karta "nabitá" (vysunutá)?
+    public bool isInteractable = true; // Can we play the card?
+    public bool isCharged = false; // Is the card "charged" (slid out)?
     
     [Header("Swipe Detection")]
-    public float minSwipeDistance = 80f; // Minimální vzdálenost pro swipe (větší pro mobil)
-    public float maxSwipeTime = 1.0f; // Maximální čas pro swipe (delší pro mobil)
-    public float maxTapDistance = 30f; // Maximální vzdálenost pro tap (aby se nespustil swipe)
+    public float minSwipeDistance = 80f; // Minimum distance for a swipe (larger for mobile)
+    public float maxSwipeTime = 1.0f; // Maximum time for a swipe (longer for mobile)
+    public float maxTapDistance = 30f; // Maximum distance for a tap (so it doesn't trigger a swipe)
     
     [Header("Visual Feedback")]
     public Color normalColor = Color.white;
-    public Color selectedColor = new Color(0.8f, 0.9f, 1f, 1f); // Světle modrá
-    public Color disabledColor = new Color(0.5f, 0.5f, 0.5f, 0.7f); // Šedá
-    public Color pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f); // Světle šedá
+    public Color selectedColor = new Color(0.8f, 0.9f, 1f, 1f); // Light blue
+    public Color disabledColor = new Color(0.5f, 0.5f, 0.5f, 0.7f); // Grey
+    public Color pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f); // Light grey
     
-    // Event pro kliknutí na kartu
+    // Event for card click
     public System.Action<Card> OnCardClicked;
     public System.Action<Card> OnCardPressed;
     public System.Action<Card> OnCardReleased;
-    public System.Action<Card> OnCardCharged; // Karta se nabila
-    public System.Action<Card> OnCardDischarged; // Karta se vybila
-    public System.Action<Card> OnCardSwipedUp; // Karta byla swipnuta nahoru (do discard)
-    public System.Action<Card> OnCardSwipedUpComplete; // Animace swipu byla dokončena
+    public System.Action<Card> OnCardCharged; // Card charged
+    public System.Action<Card> OnCardDischarged; // Card discharged
+    public System.Action<Card> OnCardSwipedUp; // Card swiped up (to discard)
+    public System.Action<Card> OnCardSwipedUpComplete; // Swipe animation finished
     
     private bool isPressed = false;
     private Vector3 originalScale;
@@ -51,13 +51,13 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
     private Vector2 touchStartPos;
     private float touchStartTime;
     private bool isTouching = false;
-    private bool wasSwipe = false; // Flag pro rozlišení tap vs swipe
+    private bool wasSwipe = false; // Flag to distinguish tap vs swipe
     private bool wasTap = false; // Flag pro detekci tap
-    private bool shouldToggleCharge = true; // Flag pro odložené přepnutí nabití
+    private bool shouldToggleCharge = true; // Flag for deferred charge toggle
     
     void Awake()
     {
-        // Pokud nemáme přiřazené komponenty, najdeme je
+        // If components not assigned, find them
         if (cardImage == null)
         {
             cardImage = GetComponent<Image>();
@@ -68,7 +68,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             cardText = GetComponentInChildren<TextMeshProUGUI>();
         }
         
-        // Hledat specifické TextMeshPro komponenty (volitelné)
+        // Look for specific TextMeshPro components (optional)
         if (valueText == null)
         {
             Transform valueTransform = transform.Find("value");
@@ -87,21 +87,21 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             }
         }
         
-        // Najít nebo vytvořit Animator
+        // Find or create Animator
         if (cardAnimator == null)
         {
             cardAnimator = GetComponent<Animator>();
             if (cardAnimator == null)
             {
                 cardAnimator = gameObject.AddComponent<Animator>();
-                Debug.LogWarning("[CardUI] Animator nebyl nalezen, byl vytvořen nový. Nezapomeňte přiřadit Animator Controller!");
+                Debug.LogWarning("[CardUI] Animator not found, a new one was created. Don't forget to assign an Animator Controller!");
             }
         }
         
-        // Přidat AnimationEventReceiver pokud neexistuje
+        // Add AnimationEventReceiver if missing
         AnimationEventReceiver.EnsureComponent(gameObject);
         
-        // Uložit původní hodnoty
+        // Store original values
         originalScale = transform.localScale;
         if (cardImage != null)
         {
@@ -114,8 +114,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         card = newCard;
         UpdateDisplay();
         
-        // NESPOUŠTĚT CardIn animaci zde - to se spouští jen v AddCardToHand() pro nové karty
-        // SetCard se volá na všech kartách při UpdateHand(), ne jen na nových
+        // Do NOT trigger CardIn here — only AddCardToHand() for new cards
+        // SetCard is called on all cards in UpdateHand(), not just new ones
     }
     
     public void SetInteractable(bool interactable)
@@ -124,7 +124,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         UpdateVisualState();
     }
     
-    // SetSelected je nyní alias pro SetCharged (pro kompatibilitu)
+    // SetSelected is now an alias for SetCharged (for compatibility)
     public void SetSelected(bool selected)
     {
         SetCharged(selected);
@@ -135,7 +135,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         isCharged = charged;
         UpdateVisualState();
         
-        // Vyvolat událost
+        // Raise event
         if (charged)
         {
             OnCardCharged?.Invoke(card);
@@ -152,34 +152,34 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
     {
         if (card == null) 
         {
-            Debug.LogWarning("[CardUI] Card je null v UpdateDisplay");
+            Debug.LogWarning("[CardUI] Card is null in UpdateDisplay");
             return;
         }
         
         
-        // Nastavit sprite karty
+        // Set card sprite
         if (cardImage != null && card.cardSprite != null)
         {
             cardImage.sprite = card.cardSprite;
         }
         else
         {
-            Debug.LogWarning($"[CardUI] Nelze nastavit sprite - cardImage: {(cardImage != null ? "OK" : "NULL")}, cardSprite: {(card.cardSprite != null ? "OK" : "NULL")}");
+            Debug.LogWarning($"[CardUI] Cannot set sprite - cardImage: {(cardImage != null ? "OK" : "NULL")}, cardSprite: {(card.cardSprite != null ? "OK" : "NULL")}");
         }
         
-        // Nastavit text karty (fallback pokud nemáme sprite)
+        // Set card text (fallback when no sprite)
         if (cardText != null)
         {
             cardText.text = $"{card.rank}\n{card.suit}";
         }
         
-        // Nastavit value text
+        // Set value text
         if (valueText != null)
         {
             valueText.text = card.rank.ToString();
         }
         
-        // Nastavit suit text
+        // Set suit text
         if (suitText != null)
         {
             suitText.text = card.suit.ToString();
@@ -200,7 +200,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         }
         else if (isCharged)
         {
-            targetColor = selectedColor; // Nabitá karta má modrou barvu
+            targetColor = selectedColor; // Charged card is blue
         }
         else if (isPressed)
         {
@@ -209,10 +209,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         
         cardImage.color = targetColor;
         
-        // Nastavit animator parametry pouze pokud má animator controller
+        // Set animator parameters only when animator has controller
         if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
         {
-            // Zkontrolovat, jestli parametr existuje před nastavením
+            // Check parameter exists before setting
             bool hasIsCharged = false;
             foreach (var param in cardAnimator.parameters)
             {
@@ -229,20 +229,20 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             }
             else
             {
-                Debug.LogWarning("[CardUI] Parametr 'IsCharged' neexistuje v Animator Controller");
+                Debug.LogWarning("[CardUI] Parameter 'IsCharged' does not exist in the Animator Controller");
             }
         }
         else if (cardAnimator != null && cardAnimator.runtimeAnimatorController == null)
         {
-            Debug.LogWarning("[CardUI] Animator nemá přiřazený Animator Controller");
+            Debug.LogWarning("[CardUI] Animator has no Animator Controller assigned");
         }
         else if (cardAnimator == null)
         {
-            Debug.LogWarning("[CardUI] Animator je null!");
+            Debug.LogWarning("[CardUI] Animator is null!");
         }
     }
     
-    // Implementace IPointerDownHandler pro stisknutí (funguje na webu i mobilu)
+    // IPointerDownHandler for press (works on web and mobile)
     public void OnPointerDown(PointerEventData eventData)
     {
         if (!isInteractable) return;
@@ -257,10 +257,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         
         UpdateVisualState();
         
-        // Spustit animaci stisknutí pouze pokud má animator controller
+        // Play press animation only when animator has controller
         if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
         {
-            // Zkontrolovat, jestli trigger existuje
+            // Check whether trigger exists
             bool hasPressTrigger = false;
             foreach (var param in cardAnimator.parameters)
             {
@@ -277,19 +277,19 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             }
         }
         
-        // Vyvolat události
+        // Raise eventi
         OnCardPressed?.Invoke(card);
         UIEvents.TriggerCardPressed(card);
     }
     
-    // Implementace IPointerUpHandler pro uvolnění (funguje na webu i mobilu)
+    // IPointerUpHandler for release (works on web and mobile)
     public void OnPointerUp(PointerEventData eventData)
     {
         if (!isInteractable) return;
         
         isPressed = false;
         
-        // Zkontrolovat swipe pouze pokud jsme dotýkali
+        // Check swipe only if we were touching
         if (isTouching)
         {
             CheckForSwipe(eventData.position);
@@ -298,23 +298,23 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         
         UpdateVisualState();
         
-        // Vyvolat události
+        // Raise eventi
         OnCardReleased?.Invoke(card);
         UIEvents.TriggerCardReleased(card);
     }
     
-    // Implementace IPointerClickHandler pro kliknutí/tap (funguje na webu i mobilu)
+    // IPointerClickHandler for click/tap (works on web and mobile)
     public void OnPointerClick(PointerEventData eventData)
     {
         if (!isInteractable) return;
         
-        // Pokud to byl swipe, neprovádět tap akci
+        // If it was a swipe, do not perform tap action
         if (wasSwipe) 
         {
             return;
         }
         
-        // Na mobilu používáme wasTap flag pro lepší detekci
+        // On mobile use wasTap flag for better detection
         #if UNITY_ANDROID || UNITY_IOS
         if (!wasTap)
         {
@@ -322,10 +322,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         }
         #endif
         
-        // Spustit animaci kliknutí pouze pokud má animator controller
+        // Play click animation only when animator has controller
         if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
         {
-            // Zkontrolovat, jestli trigger existuje
+            // Check whether trigger exists
             bool hasClickTrigger = false;
             foreach (var param in cardAnimator.parameters)
             {
@@ -342,22 +342,22 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             }
             else
             {
-                Debug.LogWarning("[CardUI] Trigger 'Click' neexistuje v Animator Controller");
+                Debug.LogWarning("[CardUI] Trigger 'Click' does not exist in the Animator Controller");
             }
         }
         
-        // Přepnout stav nabití karty pouze pokud to není swipe
+        // Toggle card charge state only when it is not a swipe
         if (shouldToggleCharge)
         {
             SetCharged(!isCharged);
         }
         
-        // Spustit animaci nabití/vybití pouze pokud se skutečně mění stav
+        // Play charge/discharge animation only when state actually changes
         if (shouldToggleCharge && cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
         {
-            if (!isCharged) // Bude se nabíjet
+            if (!isCharged) // About to charge
             {
-                // Zkontrolovat, jestli trigger existuje
+                // Check whether trigger exists
                 bool hasChargedTrigger = false;
                 foreach (var param in cardAnimator.parameters)
                 {
@@ -373,9 +373,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
                     cardAnimator.SetTrigger("Charged");
                 }
             }
-            else // Bude se vybíjet
+            else // About to discharge
             {
-                // Zkontrolovat, jestli trigger existuje
+                // Check whether trigger exists
                 bool hasDischargedTrigger = false;
                 foreach (var param in cardAnimator.parameters)
                 {
@@ -393,7 +393,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
             }
         }
         
-        // Vyvolat callback po krátké prodlevě (počkáme na animaci) pouze pokud se skutečně mění stav
+        // Raise callback after short delay (wait for animation) only when state actually changes
         if (shouldToggleCharge)
         {
             StartCoroutine(InvokeCardClickedAfterAnimation());
@@ -402,10 +402,10 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
     
     private IEnumerator InvokeCardClickedAfterAnimation()
     {
-        // Počkat na začátek animace
+        // Wait for animation to start
         yield return new WaitForSeconds(0.1f);
         
-        // Vyvolat callback
+        // Raise callback
         OnCardClicked?.Invoke(card);
     }
     
@@ -415,31 +415,31 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         float swipeDistance = Vector2.Distance(touchStartPos, endPos);
         
         
-        // Detekce tap (krátký pohyb)
+        // Tap detection (short movement)
         if (swipeDistance <= maxTapDistance && swipeTime <= 0.3f)
         {
             wasTap = true;
-            return; // Ukončit - je to tap (nabití/vybití)
+            return; // Exit — it is a tap (charge/discharge)
         }
         
-        // Detekce swipe (delší pohyb) - pouze na nabité kartě
+        // Swipe detection (longer movement) — only on charged card
         if (swipeDistance >= minSwipeDistance && swipeTime <= maxSwipeTime && isCharged)
         {
-            // Zkontrolovat směr swipu (nahoru)
+            // Check swipe direction (upward)
             Vector2 swipeDirection = (endPos - touchStartPos).normalized;
             float verticalComponent = swipeDirection.y;
             
             
-            // Swipe nahoru (vertical > 0.5 znamená více nahoru než do stran)
+            // Upward swipe (vertical > 0.5 means more up than sideways)
             if (verticalComponent > 0.5f)
             {
-                wasSwipe = true; // Označit jako swipe
-                shouldToggleCharge = false; // Zabránit přepnutí nabití v OnPointerClick
+                wasSwipe = true; // Mark as swipe
+                shouldToggleCharge = false; // Prevent charge toggle in OnPointerClick
                 
-                // Spustit animaci swipu PRVNÍ
+                // Play swipe animation FIRST
                 if (cardAnimator != null && cardAnimator.runtimeAnimatorController != null)
                 {
-                    // Zkontrolovat, jestli trigger existuje
+                    // Check whether trigger exists
                     bool hasSwipedUpTrigger = false;
                     foreach (var param in cardAnimator.parameters)
                     {
@@ -456,19 +456,19 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
                     }
                 }
                 
-                // Automaticky vybít kartu po swipu
+                // Automatically discharge card after swipe
                 SetCharged(false);
                 
-                // Vyvolat události PO spuštění animace
+                // Raise events AFTER starting animation
                 OnCardSwipedUp?.Invoke(card);
                 UIEvents.TriggerCardSwipedUp(card);
                 
-                return; // Ukončit metodu po swipu
+                return; // Exit method after swipe
             }
         }
     }
     
-    // Veřejné metody pro programové ovládání
+    // Public methods for programmatic control
     public void SimulateClick()
     {
         if (isInteractable)

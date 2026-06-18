@@ -53,7 +53,7 @@ public class RoundEndState : IGameState
     {
         var gs = GameSession.I;
 
-        // Když vypadne human, hra pro něj končí (nehrajeme dál jen mezi AI).
+        // When the human is eliminated, the game ends for them (we don't continue with AI only).
         if (gs.Human != null && gs.Human.Cash == 0)
         {
             _fsm.Go<GameOverState>();

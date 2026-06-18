@@ -22,7 +22,7 @@ public class AvatarStateView : MonoBehaviour
         if (on) 
         {
             frameAnimator?.SetTrigger("Select");
-            // Zvuk se spustí přes Animation Event
+            // Sound plays via Animation Event
         }
         Apply();
     }

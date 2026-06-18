@@ -5,7 +5,7 @@ using System.Linq;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Databáze nepřátel (AI hráčů)
+    /// Enemy database (AI players)
     /// </summary>
     [CreateAssetMenu(fileName = "EnemyDB", menuName = "Prsi/Enemy Database", order = 2)]
     public class EnemyDB : ScriptableObject
@@ -14,12 +14,12 @@ namespace Prsi.Data
         [SerializeField] private List<EnemyData> enemies = new List<EnemyData>();
         
         /// <summary>
-        /// Vrátí všechny nepřátele
+        /// Returns all enemies
         /// </summary>
         public IReadOnlyList<EnemyData> GetAllEnemies() => enemies;
         
         /// <summary>
-        /// Vrátí nepřítele podle ID
+        /// Returns enemy by ID
         /// </summary>
         public EnemyData GetEnemyById(string id)
         {
@@ -27,7 +27,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí nepřítele podle indexu
+        /// Returns enemy by index
         /// </summary>
         public EnemyData GetEnemyByIndex(int index)
         {
@@ -39,7 +39,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí náhodného nepřítele
+        /// Returns a random enemy
         /// </summary>
         public EnemyData GetRandomEnemy()
         {
@@ -48,7 +48,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí náhodné nepřátele bez duplicit
+        /// Returns random enemies without duplicates
         /// </summary>
         public List<EnemyData> GetRandomEnemies(int count, bool allowDuplicates = false)
         {
@@ -65,7 +65,7 @@ namespace Prsi.Data
             }
             else
             {
-                // Bez duplicit
+                // No duplicates
                 var available = new List<EnemyData>(enemies);
                 var result = new List<EnemyData>();
                 
@@ -82,16 +82,16 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí počet nepřátel
+        /// Returns enemy count
         /// </summary>
         public int Count => enemies.Count;
         
         /// <summary>
-        /// Validace dat v editoru
+        /// Validate data in the editor
         /// </summary>
         private void OnValidate()
         {
-            // Odstranit duplicitní ID
+            // Remove duplicate IDs
             var seenIds = new HashSet<string>();
             for (int i = enemies.Count - 1; i >= 0; i--)
             {

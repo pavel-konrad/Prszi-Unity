@@ -64,17 +64,17 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
-        // Kontrola CardManager
+        // Check CardManager
         CardManager cardManager = FindObjectOfType<CardManager>();
         if (cardManager == null)
         {
-            Debug.LogError("[GameSession] CardManager nebyl nalezen ve scéně!");
+            Debug.LogError("[GameSession] CardManager not found in the scene!");
         }
         
-        // rozpošli počáteční stav po Start() ostatních (UI už je nabindované)
+        // broadcast initial state after other Start() calls (UI is already bound)
         StartCoroutine(BroadcastInitialStateNextFrame());
         
-        // Propojit AI hráče s UI komponentami
+        // Wire AI players to UI components
         ConnectAIHandsToPlayers();
     }
 
@@ -93,8 +93,8 @@ public class GameSession : MonoBehaviour
         SessionChanged?.Invoke();
     }
 
-    // === Nové: start nové hry / vsazení potu ===
-    // Vyvolat SessionChanged událost
+    // === New: start new game / pot bet ===
+    // Raise SessionChanged event
     public void NotifySessionChanged()
     {
         SessionChanged?.Invoke();
@@ -129,24 +129,24 @@ public class GameSession : MonoBehaviour
 
     public void SetActiveIndex(int i)
     {
-        // Deaktivovat všechny hráče
+        // Deactivate all players
         for (int j = 0; j < _players.Count; j++)
         {
             if (_players[j].IsActive)
             {
                 _players[j].IsActive = false;
-                // Zvuk pro konec tahu hráče
+                // Sound for end of player's turn
                 AudioEvents.TriggerPlayerTurnEnded();
             }
         }
 
         ActiveIndex = i;
 
-        // Aktivovat nového hráče
+        // Activate the new player
         if (ActiveIndex >= 0 && ActiveIndex < _players.Count)
         {
             _players[ActiveIndex].IsActive = true;
-            // Zvuk pro začátek tahu nového hráče
+            // Sound for start of new player's turn
             AudioEvents.TriggerPlayerTurnStarted();
         }
 
@@ -155,7 +155,7 @@ public class GameSession : MonoBehaviour
         ActivePlayerChanged?.Invoke(active, ActiveIndex);
     }
     
-    /// Získá index dalšího hráče v pořadí
+    /// Gets the index of the next player in order
     public int GetNextPlayerIndex() => NextPlayableAfter(ActiveIndex);
 
     /// Next player after the given index who can still play; -1 if none.
@@ -174,15 +174,15 @@ public class GameSession : MonoBehaviour
         return -1;
     }
 
-    /// Aktivuje dalšího hráče v pořadí. Ace skip se NEkonzumuje tady — řeší ho
-    /// GameplayState, aby přeskočený hráč nejdřív krátce „stál" s hláškou v UI.
+    /// Activates the next player in order. Ace skip is NOT consumed here —
+    /// GameplayState handles it so the skipped player briefly "stands" with a UI message first.
     public void ActivateNextPlayer()
     {
         int nextIndex = NextPlayableAfter(ActiveIndex);
         if (nextIndex >= 0) SetActiveIndex(nextIndex);
     }
 
-    // === interní pomocné metody ===
+    // === internal helper methods ===
     void EnsurePlayers()
     {
         int need = 4 - _players.Count;
@@ -195,7 +195,7 @@ public class GameSession : MonoBehaviour
             _players.Add(new Player(id, name, isHuman));
         }
 
-        // výchozí ekonomika pro humana (když nebyla nastavena ze scény)
+        // default economy for human (when not set from the scene)
         if (_players[0].Cash <= 0) _players[0].SetCash(startingCash);
     }
 
@@ -207,7 +207,7 @@ public class GameSession : MonoBehaviour
             Human.SetName(PlayerPrefs.GetString(PREF_NAME, "Player"));
 
         int idx = PlayerPrefs.GetInt(PREF_AVI, -1);
-        if (idx >= 0) Human.AvatarIndex = idx; // sprite dodáme při ApplyHumanFromMenu
+        if (idx >= 0) Human.AvatarIndex = idx; // sprite supplied in ApplyHumanFromMenu
     }
 
     void RandomizeAI()
@@ -219,7 +219,7 @@ public class GameSession : MonoBehaviour
         for (int i = 1; i < _players.Count; i++)
         {
             
-            // jméno
+            // name
             string aiName = _players[i].Name;
             if (aiNames != null && aiNames.Length > 0)
             {
@@ -238,31 +238,31 @@ public class GameSession : MonoBehaviour
         }
     }
     
-    // Propojit AI hráče s AIHand UI komponentami
+    // Wire AI players to AIHand UI components
     void ConnectAIHandsToPlayers()
     {
-        // Najít CardManager
+        // Find CardManager
         CardManager cardManager = FindObjectOfType<CardManager>();
         if (cardManager == null)
         {
-            Debug.LogError("[GameSession] CardManager nebyl nalezen!");
+            Debug.LogError("[GameSession] CardManager not found!");
             return;
         }
         
-        // Najít všechny AIHand komponenty ve scéně
+        // Find all AIHand components in the scene
         AIHand[] aiHands = FindObjectsOfType<AIHand>();
         
-        // Pokud nenajdeme žádné, zkusit najít podle názvu
+        // If none found, try finding by name
         if (aiHands.Length == 0)
         {
-            // Najdeme všechny objekty ve scéně
+            // Find all objects in the scene
             GameObject[] allObjects = FindObjectsOfType<GameObject>();
             
             List<AIHand> foundHands = new List<AIHand>();
             
             foreach (var obj in allObjects)
             {
-                // Hledáme objekty s názvem obsahujícím "EnemyBar", "Enemy" nebo "AI"
+                // Look for objects whose name contains "EnemyBar", "Enemy" or "AI"
                 if (obj.name.Contains("EnemyBar") || obj.name.Contains("Enemy") || obj.name.Contains("AI"))
                 {
                     AIHand aiHand = obj.GetComponent<AIHand>();
@@ -276,15 +276,15 @@ public class GameSession : MonoBehaviour
             aiHands = foundHands.ToArray();
         }
         
-        // Propojit AI hráče s AIHand komponentami
-        for (int i = 1; i < _players.Count && i-1 < aiHands.Length; i++) // i=1 protože 0 je human
+        // Wire AI players to AIHand components
+        for (int i = 1; i < _players.Count && i-1 < aiHands.Length; i++) // i=1 because 0 is human
         {
             var aiPlayer = _players[i];
             var aiHand = aiHands[i-1];
             
             aiHand.SetAIPlayer(aiPlayer);
             
-            // Propojit s odpovídajícím CardStack z CardManager
+            // Wire to the matching CardStack from CardManager
             if (cardManager.aiHands != null && i-1 < cardManager.aiHands.Length)
             {
                 CardStack aiCardStack = cardManager.aiHands[i-1];
@@ -294,15 +294,15 @@ public class GameSession : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogError($"[GameSession] CardStack {i-1} je null!");
+                    Debug.LogError($"[GameSession] CardStack {i-1} is null!");
                 }
             }
             else
             {
-                Debug.LogError($"[GameSession] CardManager nemá nastavený CardStack pro AI {i-1}: aiHands je {(cardManager.aiHands == null ? "null" : "není null")}, délka je {(cardManager.aiHands == null ? "N/A" : cardManager.aiHands.Length.ToString())}");
+                Debug.LogError($"[GameSession] CardManager has no CardStack set for AI {i-1}: aiHands is {(cardManager.aiHands == null ? "null" : "not null")}, length is {(cardManager.aiHands == null ? "N/A" : cardManager.aiHands.Length.ToString())}");
             }
             
-            // Okamžitě aktualizovat UI
+            // Update UI immediately
             aiHand.UpdateHand(aiPlayer);
         }
         

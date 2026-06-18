@@ -29,10 +29,10 @@ public class Card : ICardData
         if (spriteManager != null)
         {
             
-            // Zkusit načíst hotový sprite
+            // Try loading ready-made sprite
             cardSprite = spriteManager.GetCardSprite(suit, rank);
             
-            // Pokud není hotový sprite, vytvořit z symbolů
+            // If no ready-made sprite, build from symbols
             if (cardSprite == null)
             {
                 cardSprite = spriteManager.CreateCardSpriteFromSymbols(suit, rank);
@@ -41,7 +41,7 @@ public class Card : ICardData
         }
         else
         {
-            Debug.LogError("[Card] CardSpriteManager nelze vytvořit!");
+            Debug.LogError("[Card] CardSpriteManager cannot be created!");
         }
     }
     

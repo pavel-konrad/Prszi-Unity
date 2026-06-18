@@ -5,7 +5,7 @@ public class CardStack : MonoBehaviour
 {
     public List<Card> cards = new List<Card>();
     
-    // Událost pro změnu karet
+    // Event for card changes
     public System.Action OnCardsChanged;
     
     public int Count => cards.Count;

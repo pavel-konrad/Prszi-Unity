@@ -5,7 +5,7 @@ using System.Linq;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Databáze témat karet
+    /// Card theme database
     /// </summary>
     [CreateAssetMenu(fileName = "CardThemeDB", menuName = "Prsi/Card Theme Database", order = 3)]
     public class CardThemeDB : ScriptableObject
@@ -17,12 +17,12 @@ namespace Prsi.Data
         [SerializeField] private string defaultThemeId;
         
         /// <summary>
-        /// Vrátí všechna témata
+        /// Returns all themes
         /// </summary>
         public IReadOnlyList<CardThemeData> GetAllThemes() => themes;
         
         /// <summary>
-        /// Vrátí téma podle ID
+        /// Returns theme by ID
         /// </summary>
         public CardThemeData GetThemeById(string id)
         {
@@ -30,7 +30,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí téma podle indexu
+        /// Returns theme by index
         /// </summary>
         public CardThemeData GetThemeByIndex(int index)
         {
@@ -42,7 +42,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí výchozí téma
+        /// Returns the default theme
         /// </summary>
         public CardThemeData GetDefaultTheme()
         {
@@ -52,7 +52,7 @@ namespace Prsi.Data
                 if (theme != null) return theme;
             }
             
-            // Pokud není nastaveno výchozí téma, vrátit první
+            // If no default theme is set, return the first one
             if (themes.Count > 0)
             {
                 return themes[0];
@@ -62,7 +62,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Nastaví výchozí téma
+        /// Sets the default theme
         /// </summary>
         public void SetDefaultTheme(string themeId)
         {
@@ -73,16 +73,16 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí počet témat
+        /// Returns theme count
         /// </summary>
         public int Count => themes.Count;
         
         /// <summary>
-        /// Validace dat v editoru
+        /// Validate data in the editor
         /// </summary>
         private void OnValidate()
         {
-            // Odstranit duplicitní ID
+            // Remove duplicate IDs
             var seenIds = new HashSet<string>();
             for (int i = themes.Count - 1; i >= 0; i--)
             {
@@ -105,7 +105,7 @@ namespace Prsi.Data
                 seenIds.Add(themes[i].id);
             }
             
-            // Validace výchozího tématu
+            // Validate default theme
             if (!string.IsNullOrEmpty(defaultThemeId))
             {
                 if (GetThemeById(defaultThemeId) == null)

@@ -5,7 +5,7 @@ using System.Linq;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Databáze avatárů pro hráče
+    /// Avatar database for players
     /// </summary>
     [CreateAssetMenu(fileName = "AvatarDB", menuName = "Prsi/Avatar Database", order = 1)]
     public class AvatarDB : ScriptableObject
@@ -14,12 +14,12 @@ namespace Prsi.Data
         [SerializeField] private List<AvatarData> avatars = new List<AvatarData>();
         
         /// <summary>
-        /// Vrátí všechny avatary
+        /// Returns all avatars
         /// </summary>
         public IReadOnlyList<AvatarData> GetAllAvatars() => avatars;
         
         /// <summary>
-        /// Vrátí avatar podle ID
+        /// Returns avatar by ID
         /// </summary>
         public AvatarData GetAvatarById(string id)
         {
@@ -27,7 +27,7 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí avatar podle indexu
+        /// Returns avatar by index
         /// </summary>
         public AvatarData GetAvatarByIndex(int index)
         {
@@ -39,16 +39,16 @@ namespace Prsi.Data
         }
         
         /// <summary>
-        /// Vrátí počet avatárů
+        /// Returns avatar count
         /// </summary>
         public int Count => avatars.Count;
         
         /// <summary>
-        /// Validace dat v editoru
+        /// Validate data in the editor
         /// </summary>
         private void OnValidate()
         {
-            // Odstranit duplicitní ID
+            // Remove duplicate IDs
             var seenIds = new HashSet<string>();
             for (int i = avatars.Count - 1; i >= 0; i--)
             {

@@ -3,23 +3,23 @@ using System.Collections.Generic;
 namespace Prsi.Core.Cards
 {
     /// <summary>
-    /// Factory pro vytváření karet správného typu
-    /// Ekvivalent JS card_factory.js z prszi projektu
+    /// Factory for creating cards of the correct type
+    /// Equivalent of JS card_factory.js from the prszi project
     /// 
-    /// Centralizuje logiku vytváření karet:
-    /// - Sedmy (7) → SevenCard
-    /// - Esa (A) → AceCard
-    /// - Dámy (Q) → QueenCard
-    /// - Ostatní → RegularCard
+    /// Centralises card-creation logic:
+    /// - Sevens (7) → SevenCard
+    /// - Aces (A) → AceCard
+    /// - Queens (Q) → QueenCard
+    /// - Everything else → RegularCard
     /// </summary>
     public static class CardFactory
     {
         /// <summary>
-        /// Vytvoří kartu správného typu podle hodnoty
+        /// Creates a card of the correct type based on rank
         /// </summary>
-        /// <param name="suit">Barva karty</param>
-        /// <param name="rank">Hodnota karty</param>
-        /// <returns>Instance správného typu karty</returns>
+        /// <param name="suit">Card suit</param>
+        /// <param name="rank">Card rank</param>
+        /// <returns>Instance of the correct card type</returns>
         public static BaseCard Create(Suit suit, Rank rank)
         {
             return rank switch
@@ -32,9 +32,9 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Vytvoří kompletní balíček 32 karet (německý mariáš)
+        /// Creates a full 32-card deck (German mariáš)
         /// </summary>
-        /// <returns>Seznam všech 32 karet</returns>
+        /// <returns>List of all 32 cards</returns>
         public static List<BaseCard> CreateDeck()
         {
             var deck = new List<BaseCard>(32);
@@ -51,12 +51,12 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Vytvoří balíček s vlastní konfigurací
-        /// Pro budoucí rozšíření (např. různé balíčky)
+        /// Creates a deck with a custom configuration
+        /// For future extensions (e.g. different decks)
         /// </summary>
-        /// <param name="suits">Seznam barev</param>
-        /// <param name="ranks">Seznam hodnot</param>
-        /// <returns>Seznam karet</returns>
+        /// <param name="suits">List of suits</param>
+        /// <param name="ranks">List of ranks</param>
+        /// <returns>List of cards</returns>
         public static List<BaseCard> CreateDeck(IEnumerable<Suit> suits, IEnumerable<Rank> ranks)
         {
             var deck = new List<BaseCard>();
@@ -73,7 +73,7 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Zkontroluje, zda je karta speciální (sedma, eso, dáma)
+        /// Checks whether the card is special (Seven, Ace, Queen)
         /// </summary>
         public static bool IsSpecialRank(Rank rank)
         {

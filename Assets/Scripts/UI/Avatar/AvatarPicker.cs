@@ -36,12 +36,12 @@ public class AvatarPicker : MonoBehaviour
 	if (previewAnimator) 
 	{
 		previewAnimator.SetTrigger("Pop");
-		// Zvuk se spustí přes Animation Event
+		// Sound plays via Animation Event
 	}
 
 	var gs = GameSession.I;
 	if (gs != null && gs.Players.Count > 0) {
-		gs.Players[0].SetAvatar(sprite);  // uloží sprite do hráče
+		gs.Players[0].SetAvatar(sprite);  // store sprite into the player
 	}
 
 	PlayerPrefs.SetInt("p_avatar_idx", selectedIndex);

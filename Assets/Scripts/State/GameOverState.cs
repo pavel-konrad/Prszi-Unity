@@ -20,7 +20,7 @@ public class GameOverState : IGameState
         var gs = GameSession.I;
         var winner = TournamentRules.OverallWinner(new List<ITournamentPlayer>(gs.Players));
 
-        // Zpráva podle toho, jak hra skončila pro human hráče.
+        // Message based on how the game ended for the human player.
         string message;
         if (gs.Human != null && gs.Human.Cash == 0)
             message = "Vypadl jsi!";

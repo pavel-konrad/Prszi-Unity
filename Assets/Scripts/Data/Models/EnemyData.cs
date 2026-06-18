@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Data pro jednoho nepřítele (AI hráče)
+    /// Data for a single enemy (AI player)
     /// </summary>
     [System.Serializable]
     public class EnemyData

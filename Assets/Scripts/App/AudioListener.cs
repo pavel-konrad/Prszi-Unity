@@ -10,15 +10,15 @@ public class AudioListener : MonoBehaviour
     
     [Header("UI Sounds")]
     public AudioClip popSound;
-    public AudioClip modalOpenSound;    // Zvuk otevření modalu
-    public AudioClip modalCloseSound;   // Zvuk zavření modalu
-    public AudioClip modalButtonSound;  // Zvuk kliknutí na tlačítko v modalu
+    public AudioClip modalOpenSound;    // Modal open sound
+    public AudioClip modalCloseSound;   // Modal close sound
+    public AudioClip modalButtonSound;  // Modal button click sound
     
     [Header("Card Sounds")]
     public AudioClip cardDealtSound;
     public AudioClip cardPlayedSound;
-    public AudioClip cardSelectedSound;  // Nový zvuk pro výběr karet
-    public AudioClip cardSwipedSound;    // Nový zvuk pro swipe karet
+    public AudioClip cardSelectedSound;  // New sound for card selection
+    public AudioClip cardSwipedSound;    // New sound for card swipe
     
     [Header("Player Turn Sounds")]
     public AudioClip playerTurnEndedSound;
@@ -35,7 +35,7 @@ public class AudioListener : MonoBehaviour
     public float cardSoundVolume = 0.6f;
     public float gameSoundVolume = 0.8f;
 
-    // AudioSource komponenty pro různé typy zvuků
+    // AudioSource components for different sound types
     private AudioSource betAudioSource;
     private AudioSource cashAudioSource;
     private AudioSource cardAudioSource;
@@ -43,13 +43,13 @@ public class AudioListener : MonoBehaviour
 
     void Awake()
     {
-        // Vytvořit AudioSource komponenty
+        // Create AudioSource components
         betAudioSource = gameObject.AddComponent<AudioSource>();
         cashAudioSource = gameObject.AddComponent<AudioSource>();
         cardAudioSource = gameObject.AddComponent<AudioSource>();
         gameAudioSource = gameObject.AddComponent<AudioSource>();
         
-        // Nastavit vlastnosti
+        // Set properties
         betAudioSource.playOnAwake = false;
         cashAudioSource.playOnAwake = false;
         cardAudioSource.playOnAwake = false;
@@ -58,7 +58,7 @@ public class AudioListener : MonoBehaviour
 
     void OnEnable()
     {
-        // Přihlásit se k událostem
+        // Subscribe to events
         AudioEvents.OnBetPlaced += PlayBetPlace;
         AudioEvents.OnCashDecreased += PlayCashDecrease;
         AudioEvents.OnCashIncreased += PlayCashIncrease;
@@ -70,7 +70,7 @@ public class AudioListener : MonoBehaviour
         AudioEvents.OnCardPlayed += PlayCardPlayed;
         AudioEvents.OnCardSelected += PlayCardSelected;
         AudioEvents.OnCardDeselected += PlayCardDeselected;
-        AudioEvents.OnCardSwiped += PlayCardSwiped;  // Nová událost pro swipe
+        AudioEvents.OnCardSwiped += PlayCardSwiped;  // New event for swipe
         AudioEvents.OnPlayerTurnEnded += PlayPlayerTurnEnded;
         AudioEvents.OnPlayerTurnStarted += PlayPlayerTurnStarted;
         AudioEvents.OnGameStart += PlayGameStart;
@@ -80,7 +80,7 @@ public class AudioListener : MonoBehaviour
 
     void OnDisable()
     {
-        // Odhlásit se z událostí
+        // Unsubscribe from events
         AudioEvents.OnBetPlaced -= PlayBetPlace;
         AudioEvents.OnCashDecreased -= PlayCashDecrease;
         AudioEvents.OnCashIncreased -= PlayCashIncrease;
@@ -92,7 +92,7 @@ public class AudioListener : MonoBehaviour
         AudioEvents.OnCardPlayed -= PlayCardPlayed;
         AudioEvents.OnCardSelected -= PlayCardSelected;
         AudioEvents.OnCardDeselected -= PlayCardDeselected;
-        AudioEvents.OnCardSwiped -= PlayCardSwiped;  // Nová událost pro swipe
+        AudioEvents.OnCardSwiped -= PlayCardSwiped;  // New event for swipe
         AudioEvents.OnPlayerTurnEnded -= PlayPlayerTurnEnded;
         AudioEvents.OnPlayerTurnStarted -= PlayPlayerTurnStarted;
         AudioEvents.OnGameStart -= PlayGameStart;
@@ -166,7 +166,7 @@ public class AudioListener : MonoBehaviour
         }
     }
 
-    // Přehrát zvuk pouze po určitou dobu
+    // Play sound for a limited duration only
     IEnumerator PlayCashSoundForDuration(AudioClip clip, float duration)
     {
         cashAudioSource.clip = clip;
@@ -208,7 +208,7 @@ public class AudioListener : MonoBehaviour
         }
         else if (popSound != null && cardAudioSource != null)
         {
-            // Fallback na původní zvuk pokud není nastaven nový
+            // Fallback to original sound if new one not set
             cardAudioSource.clip = popSound;
             cardAudioSource.volume = cardSoundVolume;
             cardAudioSource.Play();
@@ -225,7 +225,7 @@ public class AudioListener : MonoBehaviour
         }
         else if (cardPlayedSound != null && cardAudioSource != null)
         {
-            // Fallback na zvuk zahrání karty pokud není nastaven nový
+            // Fallback to card-played sound if new one not set
             cardAudioSource.clip = cardPlayedSound;
             cardAudioSource.volume = cardSoundVolume;
             cardAudioSource.Play();
@@ -242,7 +242,7 @@ public class AudioListener : MonoBehaviour
         }
         else if (popSound != null && cardAudioSource != null)
         {
-            // Fallback na popSound pokud není nastaven nový
+            // Fallback to popSound if new one not set
             cardAudioSource.clip = popSound;
             cardAudioSource.volume = cardSoundVolume;
             cardAudioSource.Play();
@@ -259,7 +259,7 @@ public class AudioListener : MonoBehaviour
         }
         else if (popSound != null && cardAudioSource != null)
         {
-            // Fallback na popSound pokud není nastaven nový
+            // Fallback to popSound if new one not set
             cardAudioSource.clip = popSound;
             cardAudioSource.volume = cardSoundVolume;
             cardAudioSource.Play();
@@ -268,8 +268,8 @@ public class AudioListener : MonoBehaviour
     
     void PlayCardDeselected()
     {
-        // Tichý nebo žádný zvuk pro zrušení výběru
-        // Můžeme použít velmi tichý popSound nebo nic
+        // Quiet or no sound for deselection
+        // Can use very quiet popSound or nothing
     }
 
     void PlayGameStart()

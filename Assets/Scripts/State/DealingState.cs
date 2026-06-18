@@ -18,23 +18,23 @@ public class DealingState : IGameState
     public void Tick(float dt){}
 
     IEnumerator DealRoutine(){
-        // Vymazat aktivního hráče během rozdávání
+        // Clear active player during dealing
         GameSession.I.SetActiveIndex(-1);
         
-        // Spustit animace rozdání karet pro všechny hand komponenty
+        // Start deal animations for all hand components
         StartDealingAnimations();
         
-        // Počkat na začátek animací
+        // Wait for animations to start
         yield return new WaitForSeconds(0.5f);
 
-        // Rozdat karty
+        // Deal cards
         var cardManager = Object.FindFirstObjectByType<CardManager>();
         
         if (cardManager != null)
         {
             cardManager.DealCardsToPlayers();
             
-            // Aktualizovat UI pro rozdání karet
+            // Update UI for dealing cards
             PlayerHand playerHand = Object.FindFirstObjectByType<PlayerHand>();
             if (playerHand != null)
             {
@@ -43,37 +43,37 @@ public class DealingState : IGameState
         }
         else
         {
-            Debug.LogError("[DealingState] CardManager nebyl nalezen! Zkontrolujte, zda je v scéně.");
+            Debug.LogError("[DealingState] CardManager not found! Check whether it is in the scene.");
         }
 
-        // Vyvolat události pro UI
+        // Raise events for UI
         GameSession.I.NotifySessionChanged();
 
-        // Human začíná
+        // Human goes first
         GameSession.I.SetActiveIndex(0);
 
-        // Rovnou do hry (žádné sázení — turnaj řeší ekonomiku až na konci kola)
+        // Straight into gameplay (no betting — tournament economy settles at round end)
         _fsm.Go<GameplayState>();
     }
     
-    // Spustit animace rozdávání pro všechny hand komponenty
+    // Start dealing animations for all hand components
     void StartDealingAnimations()
     {
-        // Najít PlayerHand komponentu
+        // Find PlayerHand component
         PlayerHand playerHand = Object.FindFirstObjectByType<PlayerHand>();
         if (playerHand != null)
         {
             playerHand.StartDealingAnimation();
         }
         
-        // Najít všechny AIHand komponenty
+        // Find all AIHand components
         AIHand[] aiHands = Object.FindObjectsOfType<AIHand>();
         foreach (var aiHand in aiHands)
         {
             aiHand.StartDealingAnimation();
         }
         
-        // Zvuk se spustí přes Animation Events v jednotlivých hand animacích
-        // AudioEvents.TriggerCardDealt() se volá z AnimationEventReceiver
+        // Sound plays via Animation Events in individual hand animations
+        // AudioEvents.TriggerCardDealt() is called from AnimationEventReceiver
     }
 }

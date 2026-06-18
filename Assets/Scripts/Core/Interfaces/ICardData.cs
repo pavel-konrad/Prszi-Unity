@@ -4,7 +4,7 @@ using Prsi.Core.Cards;
 namespace Prsi.Core
 {
     /// <summary>
-    /// Interface pro data karty (bez Unity závislostí)
+    /// Interface for card data (no Unity dependencies)
     /// </summary>
     public interface ICardData
     {

@@ -3,19 +3,19 @@ using Prsi.Core.Game;
 namespace Prsi.Core.Cards
 {
     /// <summary>
-    /// Dáma (svršek) - speciální karta se změnou barvy
+    /// Queen — special card that changes suit
     /// 
-    /// Pravidla Prší:
-    /// - Lze zahrát na COKOLIV (nezáleží na barvě ani hodnotě)
-    /// - Hráč si vybírá novou barvu, kterou musí další hráč hrát
+    /// Prší rules:
+    /// - May be played on ANYTHING (suit and rank do not matter)
+    /// - Player picks a new suit that the next player must follow
     /// </summary>
     public class QueenCard : BaseCard
     {
         public override bool IsSpecial => true;
         
         /// <summary>
-        /// Vybraná barva po zahrání dámy
-        /// Nastavuje se před voláním OnPlay()
+        /// Selected suit after a Queen is played
+        /// Set before calling OnPlay()
         /// </summary>
         public Suit? SelectedSuit { get; set; }
         
@@ -24,53 +24,53 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Dámu lze zahrát VŽDY (na cokoliv)
-        /// Výjimka: nelze zahrát při aktivní penalizaci (sedmy)
+        /// Queen may ALWAYS be played (on anything)
+        /// Exception: cannot be played while a draw penalty is active (Sevens)
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
-            // Na čekající eso lze reagovat jen esem.
+            // Only an Ace may respond to a pending Ace.
             if (context?.AcePending == true)
             {
                 return false;
             }
 
-            // Pokud je aktivní penalizace líznutí, nelze zahrát dámu
+            // If a draw penalty is active, Queen cannot be played
             if (context?.PendingDrawCount > 0)
             {
                 return false;
             }
 
-            // Dámu lze zahrát na cokoliv!
+            // Queen may be played on anything!
             return true;
         }
         
         /// <summary>
-        /// Efekt dámy: nastaví vynucenou barvu
+        /// Queen effect: sets forced suit
         /// 
-        /// POZNÁMKA: SelectedSuit musí být nastavena před voláním této metody
-        /// (typicky přes UI dialog pro výběr barvy)
+        /// NOTE: SelectedSuit must be set before calling this method
+        /// (typically via a UI dialog to pick the suit)
         /// 
-        /// Pokud SelectedSuit není nastavena, použije se barva dámy
+        /// If SelectedSuit is not set, the Queen's suit is used
         /// </summary>
         public override void OnPlay(GameContext context, IPlayerData player)
         {
-            // Určit novou barvu - buď vybranou, nebo barvu dámy
+            // Determine new suit — either the selected one or the Queen's suit
             Suit newSuit = SelectedSuit ?? Suit;
             
-            // Nastavit vynucenou barvu
+            // Set forced suit
             context?.NotifySuitChanged(newSuit);
             
-            // Notifikovat o zahrání karty
+            // Notify that the card was played
             context?.NotifyCardPlayed(this, player);
             
-            // Reset vybrané barvy pro příští použití
+            // Reset selected suit for next use
             SelectedSuit = null;
         }
         
         /// <summary>
-        /// Nastaví vybranou barvu před zahráním
-        /// Volá se z UI před OnPlay()
+        /// Sets the selected suit before playing
+        /// Called from UI before OnPlay()
         /// </summary>
         public void SelectSuit(Suit suit)
         {

@@ -15,10 +15,10 @@ namespace Prsi.Core.Game
         private readonly List<ICardData> cards = new List<ICardData>();
         private readonly System.Random rng;
 
-        /// <summary>Balíček s náhodným seedem (běžná hra).</summary>
+        /// <summary>Deck with a random seed (normal play).</summary>
         public Deck() : this(System.Environment.TickCount) { }
 
-        /// <summary>Balíček s daným seedem (reprodukovatelný — testy, replaye).</summary>
+        /// <summary>Deck with a given seed (reproducible — tests, replays).</summary>
         public Deck(int seed)
         {
             rng = new System.Random(seed);
@@ -27,7 +27,7 @@ namespace Prsi.Core.Game
         public int RemainingCards => cards.Count;
         public bool IsEmpty => cards.Count == 0;
 
-        /// <summary>Naplní balíček 32 polymorfními kartami (mariáš) a zamíchá. Hlavně pro testy.</summary>
+        /// <summary>Fills the deck with 32 polymorphic cards (mariáš) and shuffles. Mainly for tests.</summary>
         public void Initialize()
         {
             cards.Clear();
@@ -35,19 +35,19 @@ namespace Prsi.Core.Game
             Shuffle();
         }
 
-        /// <summary>Přidá kartu na spodek balíčku.</summary>
+        /// <summary>Adds a card to the bottom of the deck.</summary>
         public void AddCard(ICardData card)
         {
             if (card != null) cards.Add(card);
         }
 
-        /// <summary>Přidá více karet na spodek balíčku.</summary>
+        /// <summary>Adds multiple cards to the bottom of the deck.</summary>
         public void AddCards(IEnumerable<ICardData> cardsToAdd)
         {
             foreach (var card in cardsToAdd) AddCard(card);
         }
 
-        /// <summary>Lízne kartu z vrcholu balíčku (null když je prázdný).</summary>
+        /// <summary>Draws a card from the top of the deck (null when empty).</summary>
         public ICardData DrawCard()
         {
             if (cards.Count == 0) return null;
@@ -57,7 +57,7 @@ namespace Prsi.Core.Game
             return card;
         }
 
-        /// <summary>Fisher-Yates shuffle se seedovaným RNG.</summary>
+        /// <summary>Fisher-Yates shuffle with a seeded RNG.</summary>
         public void Shuffle()
         {
             for (int i = cards.Count - 1; i > 0; i--)
@@ -77,10 +77,10 @@ namespace Prsi.Core.Game
             Shuffle();
         }
 
-        /// <summary>Vyčistí balíček.</summary>
+        /// <summary>Clears the deck.</summary>
         public void Clear() => cards.Clear();
 
-        /// <summary>Karta na dané pozici bez odebrání (null mimo rozsah).</summary>
+        /// <summary>Card at the given index without removing it (null if out of range).</summary>
         public ICardData Peek(int index = 0)
             => index >= 0 && index < cards.Count ? cards[index] : null;
     }

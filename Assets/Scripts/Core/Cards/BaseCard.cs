@@ -3,12 +3,12 @@ using Prsi.Core.Game;
 namespace Prsi.Core.Cards
 {
     /// <summary>
-    /// Abstraktní základní třída pro všechny karty
-    /// Ekvivalent JS base_card.js z prszi projektu
+    /// Abstract base class for all cards
+    /// Equivalent of JS base_card.js from the prszi project
     /// 
-    /// Implementuje polymorfismus - každý typ karty má vlastní chování:
-    /// - CanPlayOn() - zda lze kartu zahrát na vrchní kartu
-    /// - OnPlay() - co se stane po zahrání karty
+    /// Implements polymorphism — each card type has its own behaviour:
+    /// - CanPlayOn() — whether the card may be played on the top card
+    /// - OnPlay() — what happens after the card is played
     /// </summary>
     public abstract class BaseCard : ICardData
     {
@@ -16,8 +16,8 @@ namespace Prsi.Core.Cards
         public Rank Rank { get; }
         
         /// <summary>
-        /// Zda je karta speciální (má zvláštní efekt)
-        /// Override v potomcích pro SevenCard, AceCard, QueenCard
+        /// Whether the card is special (has a special effect)
+        /// Override in subclasses for SevenCard, AceCard, QueenCard
         /// </summary>
         public virtual bool IsSpecial => false;
         
@@ -28,43 +28,43 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Zkontroluje, zda lze tuto kartu zahrát na vrchní kartu
+        /// Checks whether this card may be played on the top card
         /// 
-        /// Základní pravidla Prší:
-        /// - Stejná barva
-        /// - Stejná hodnota
-        /// - Speciální karty mohou mít vlastní pravidla (např. dáma na cokoliv)
+        /// Basic Prší rules:
+        /// - Same suit
+        /// - Same rank
+        /// - Special cards may have their own rules (e.g. Queen on anything)
         /// </summary>
-        /// <param name="topCard">Vrchní karta na odhazovacím balíčku</param>
-        /// <param name="context">Herní kontext (pro kontrolu vynucené barvy atd.)</param>
-        /// <returns>True pokud lze kartu zahrát</returns>
+        /// <param name="topCard">Top card on the discard pile</param>
+        /// <param name="context">Game context (for forced-suit checks, etc.)</param>
+        /// <returns>True if the card may be played</returns>
         public abstract bool CanPlayOn(ICardData topCard, GameContext context);
         
         /// <summary>
-        /// Provede efekt karty po zahrání
+        /// Applies the card effect after it is played
         /// 
-        /// Polymorfní metoda - každý typ karty má vlastní implementaci:
-        /// - RegularCard: žádný speciální efekt
-        /// - SevenCard: další hráč musí líznout 2 karty
-        /// - AceCard: přeskočí dalšího hráče
-        /// - QueenCard: hráč vybírá novou barvu
+        /// Polymorphic method — each card type has its own implementation:
+        /// - RegularCard: no special effect
+        /// - SevenCard: next player must draw 2 cards
+        /// - AceCard: skips the next player
+        /// - QueenCard: player picks a new suit
         /// </summary>
-        /// <param name="context">Herní kontext pro modifikaci stavu hry</param>
-        /// <param name="player">Hráč, který kartu zahrál</param>
+        /// <param name="context">Game context for modifying game state</param>
+        /// <param name="player">Player who played the card</param>
         public abstract void OnPlay(GameContext context, IPlayerData player);
         
         /// <summary>
-        /// Základní kontrola hratelnosti - stejná barva nebo hodnota
-        /// Pomocná metoda pro potomky
+        /// Basic playability check — same suit or rank
+        /// Helper method for subclasses
         /// </summary>
         protected bool MatchesSuitOrRank(ICardData topCard)
         {
-            if (topCard == null) return true; // První karta
+            if (topCard == null) return true; // First card
             return Suit == topCard.Suit || Rank == topCard.Rank;
         }
         
         /// <summary>
-        /// Kontrola vynucené barvy (po zahrání dámy)
+        /// Forced-suit check (after a Queen is played)
         /// </summary>
         protected bool MatchesForcedSuit(GameContext context)
         {

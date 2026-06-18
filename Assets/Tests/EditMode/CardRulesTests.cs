@@ -7,49 +7,49 @@ using Prsi.Core.Game;
 namespace Prsi.Tests.EditMode
 {
     /// <summary>
-    /// Pattern #1 — Strategy / polymorfismus karet.
-    /// Každý test mapuje na klauzuli ze SPEC.md. Asserty na exaktní hodnoty.
-    /// Doména je čistá (Prsi.Core), takže běží v EditMode bez scény/enginu.
+    /// Pattern #1 — Strategy / card polymorphism.
+    /// Each test maps to a clause in SPEC.md. Asserts exact values.
+    /// Domain is pure (Prsi.Core), so it runs in EditMode without a scene/engine.
     /// </summary>
     public class CardRulesTests
     {
-        // Sdílený herní kontext bez balíčku/discardu — pravidla karet je nepotřebují.
+        // Shared game context without deck/discard — card rules do not need them.
         private static GameContext Ctx() => new GameContext(new List<IPlayerData>());
 
         private static BaseCard Card(Suit s, Rank r) => CardFactory.Create(s, r);
 
-        // === S2 — základ hratelnosti ===
+        // === S2 — basic playability ===
 
-        [Test] // S2.1 — stejná barva
+        [Test] // S2.1 — same suit
         public void Regular_SameSuit_IsPlayable()
         {
             var top = Card(Suit.Hearts, Rank.Eight);
             Assert.IsTrue(Card(Suit.Hearts, Rank.Ten).CanPlayOn(top, Ctx()));
         }
 
-        [Test] // S2.1 — stejná hodnota
+        [Test] // S2.1 — same rank
         public void Regular_SameRank_IsPlayable()
         {
             var top = Card(Suit.Hearts, Rank.Eight);
             Assert.IsTrue(Card(Suit.Spades, Rank.Eight).CanPlayOn(top, Ctx()));
         }
 
-        [Test] // S2.1 — jiná barva i hodnota → nehratelné
+        [Test] // S2.1 — different suit and rank → not playable
         public void Regular_DifferentSuitAndRank_NotPlayable()
         {
             var top = Card(Suit.Hearts, Rank.Eight);
             Assert.IsFalse(Card(Suit.Spades, Rank.Nine).CanPlayOn(top, Ctx()));
         }
 
-        [Test] // S2.2 — první karta (prázdný discard) → hratelné cokoliv ne-penalizačního
+        [Test] // S2.2 — first card (empty discard) → any non-penalty card is playable
         public void Regular_OnEmptyDiscard_IsPlayable()
         {
             Assert.IsTrue(Card(Suit.Hearts, Rank.Eight).CanPlayOn(null, Ctx()));
         }
 
-        // === S3 — speciální karty ===
+        // === S3 — special cards ===
 
-        [Test] // S3.1 — sedma přidá +2, kumulativně
+        [Test] // S3.1 — Seven adds +2, cumulatively
         public void Seven_OnPlay_AccumulatesDrawPenalty()
         {
             var ctx = Ctx();
@@ -59,18 +59,18 @@ namespace Prsi.Tests.EditMode
             Assert.AreEqual(4, ctx.PendingDrawCount);
         }
 
-        [Test] // S3.2 — při penalizaci se brání jen sedma (na sedmu)
+        [Test] // S3.2 — during a penalty only a Seven can defend (on a Seven)
         public void DuringPenalty_OnlySeven_CanDefendOnSeven()
         {
             var ctx = Ctx();
             var topSeven = Card(Suit.Hearts, Rank.Seven);
             topSeven.OnPlay(ctx, null); // PendingDrawCount = 2
 
-            Assert.IsTrue(Card(Suit.Diamonds, Rank.Seven).CanPlayOn(topSeven, ctx), "sedma se brání");
-            Assert.IsFalse(Card(Suit.Hearts, Rank.Eight).CanPlayOn(topSeven, ctx), "běžná ne");
+            Assert.IsTrue(Card(Suit.Diamonds, Rank.Seven).CanPlayOn(topSeven, ctx), "a Seven defends");
+            Assert.IsFalse(Card(Suit.Hearts, Rank.Eight).CanPlayOn(topSeven, ctx), "a regular card cannot");
         }
 
-        [Test] // S3.3 — eso nastaví AcePending (další musí přebít nebo stát)
+        [Test] // S3.3 — Ace sets AcePending (next must beat it or stand)
         public void Ace_OnPlay_SetsAcePending()
         {
             var ctx = Ctx();
@@ -78,7 +78,7 @@ namespace Prsi.Tests.EditMode
             Assert.IsTrue(ctx.AcePending);
         }
 
-        [Test] // S3.3 — eso nelze hrát při penalizaci (sedma)
+        [Test] // S3.3 — Ace cannot be played during a penalty (Seven)
         public void Ace_DuringPenalty_NotPlayable()
         {
             var ctx = Ctx();
@@ -87,26 +87,26 @@ namespace Prsi.Tests.EditMode
             Assert.IsFalse(Card(Suit.Spades, Rank.Ace).CanPlayOn(top, ctx));
         }
 
-        [Test] // S3.9 — na čekající eso lze přebít jen esem (ostatní karty ne)
+        [Test] // S3.9 — a pending Ace can only be beaten by an Ace (no other card)
         public void AcePending_OnlyAce_CanRespond()
         {
             var ctx = Ctx();
             ctx.AcePending = true;
             var top = Card(Suit.Spades, Rank.Ace);
-            Assert.IsTrue(Card(Suit.Hearts, Rank.Ace).CanPlayOn(top, ctx), "eso přebije eso");
-            Assert.IsFalse(Card(Suit.Spades, Rank.Eight).CanPlayOn(top, ctx), "běžná ne");
-            Assert.IsFalse(Card(Suit.Spades, Rank.Seven).CanPlayOn(top, ctx), "sedma ne");
-            Assert.IsFalse(Card(Suit.Spades, Rank.Queen).CanPlayOn(top, ctx), "dáma ne");
+            Assert.IsTrue(Card(Suit.Hearts, Rank.Ace).CanPlayOn(top, ctx), "Ace beats Ace");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Eight).CanPlayOn(top, ctx), "a regular card cannot");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Seven).CanPlayOn(top, ctx), "a Seven cannot");
+            Assert.IsFalse(Card(Suit.Spades, Rank.Queen).CanPlayOn(top, ctx), "a Queen cannot");
         }
 
-        [Test] // S3.4 — dáma na cokoliv
+        [Test] // S3.4 — Queen on anything
         public void Queen_IsPlayable_OnAnything()
         {
             var top = Card(Suit.Hearts, Rank.Eight);
             Assert.IsTrue(Card(Suit.Spades, Rank.Queen).CanPlayOn(top, Ctx()));
         }
 
-        [Test] // S3.5 — dáma OnPlay nastaví vynucenou barvu na vybranou
+        [Test] // S3.5 — Queen OnPlay sets the forced suit to the selected one
         public void Queen_OnPlay_SetsForcedSuitToSelected()
         {
             var ctx = Ctx();
@@ -116,7 +116,7 @@ namespace Prsi.Tests.EditMode
             Assert.AreEqual(Suit.Clubs, ctx.ForcedSuit.Value);
         }
 
-        [Test] // S3.6 — dáma nelze hrát při penalizaci
+        [Test] // S3.6 — Queen cannot be played during a penalty
         public void Queen_DuringPenalty_NotPlayable()
         {
             var ctx = Ctx();
@@ -125,17 +125,17 @@ namespace Prsi.Tests.EditMode
             Assert.IsFalse(Card(Suit.Spades, Rank.Queen).CanPlayOn(top, ctx));
         }
 
-        [Test] // S3.7 — vynucená barva omezuje běžnou kartu
+        [Test] // S3.7 — forced suit restricts a regular card
         public void ForcedSuit_RestrictsRegularCard()
         {
             var ctx = Ctx();
             ctx.NotifySuitChanged(Suit.Clubs);
-            var top = Card(Suit.Clubs, Rank.Ten); // při forced suit na topu nezáleží
-            Assert.IsFalse(Card(Suit.Hearts, Rank.Eight).CanPlayOn(top, ctx), "jiná barva ne");
-            Assert.IsTrue(Card(Suit.Clubs, Rank.Nine).CanPlayOn(top, ctx), "shoda barvy ano");
+            var top = Card(Suit.Clubs, Rank.Ten); // with a forced suit the top card doesn't matter
+            Assert.IsFalse(Card(Suit.Hearts, Rank.Eight).CanPlayOn(top, ctx), "different suit cannot");
+            Assert.IsTrue(Card(Suit.Clubs, Rank.Nine).CanPlayOn(top, ctx), "matching suit can");
         }
 
-        [Test] // S3.8 — běžná karta zruší vynucenou barvu
+        [Test] // S3.8 — a regular card clears the forced suit
         public void Regular_OnPlay_ClearsForcedSuit()
         {
             var ctx = Ctx();

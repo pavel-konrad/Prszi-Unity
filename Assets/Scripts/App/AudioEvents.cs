@@ -3,34 +3,34 @@ using System;
 
 public static class AudioEvents
 {
-    // Události pro zvuky sázek
+    // Events for bet sounds
     public static event Action OnBetPlaced;
-    public static event Action<float> OnCashDecreased; // s délkou animace
-    public static event Action<float> OnCashIncreased; // s délkou animace
+    public static event Action<float> OnCashDecreased; // with animation duration
+    public static event Action<float> OnCashIncreased; // with animation duration
     
-    // Události pro UI zvuky
+    // Events for UI sounds
     public static event Action OnPopAnimation;
     public static event Action OnModalOpen;
     public static event Action OnModalClose;
     public static event Action OnModalButtonClick;
     
-    // Události pro zvuky karet
+    // Events for card sounds
     public static event Action OnCardDealt;
     public static event Action OnCardPlayed;
     public static event Action OnCardSelected;
     public static event Action OnCardDeselected;
-    public static event Action OnCardSwiped;  // Nová událost pro swipe
+    public static event Action OnCardSwiped;  // New event for swipe
     
-    // Události pro zvuky hry
+    // Events for game sounds
     public static event Action OnGameStart;
     public static event Action OnGameWin;
     public static event Action OnGameLose;
     
-    // Události pro zvuky hráčů
+    // Events for player sounds
     public static event Action OnPlayerTurnEnded;
     public static event Action OnPlayerTurnStarted;
 
-    // Metody pro vyvolání událostí
+    // Methods for raising events
     public static void TriggerBetPlaced() => OnBetPlaced?.Invoke();
     public static void TriggerCashDecreased(float duration) => OnCashDecreased?.Invoke(duration);
     public static void TriggerCashIncreased(float duration) => OnCashIncreased?.Invoke(duration);
@@ -43,7 +43,7 @@ public static class AudioEvents
     public static void TriggerCardPlayed() => OnCardPlayed?.Invoke();
     public static void TriggerCardSelected() => OnCardSelected?.Invoke();
     public static void TriggerCardDeselected() => OnCardDeselected?.Invoke();
-    public static void TriggerCardSwiped() => OnCardSwiped?.Invoke();  // Nový trigger pro swipe
+    public static void TriggerCardSwiped() => OnCardSwiped?.Invoke();  // New trigger for swipe
     
     public static void TriggerGameStart() => OnGameStart?.Invoke();
     public static void TriggerGameWin() => OnGameWin?.Invoke();

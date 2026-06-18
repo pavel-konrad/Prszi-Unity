@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Prsi.Core
 {
     /// <summary>
-    /// Interface pro data hráče
+    /// Interface for player data
     /// </summary>
     public interface IPlayerData
     {

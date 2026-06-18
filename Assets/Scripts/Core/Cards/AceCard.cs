@@ -3,11 +3,11 @@ using Prsi.Core.Game;
 namespace Prsi.Core.Cards
 {
     /// <summary>
-    /// Eso - speciální karta s efektem přeskočení
+    /// Ace — special card with a skip effect
     /// 
-    /// Pravidla Prší:
-    /// - Další hráč je přeskočen (stojí)
-    /// - Lze zahrát na kartu stejné barvy nebo hodnoty
+    /// Prší rules:
+    /// - Next player is skipped (stands)
+    /// - May be played on a card of the same suit or rank
     /// </summary>
     public class AceCard : BaseCard
     {
@@ -18,49 +18,49 @@ namespace Prsi.Core.Cards
         }
         
         /// <summary>
-        /// Eso lze zahrát pokud:
-        /// 1. Není aktivní penalizace (sedmy) - eso se nemůže bránit
-        /// 2. Standardní pravidlo: stejná barva/hodnota
+        /// Ace may be played if:
+        /// 1. No draw penalty is active (Sevens) — Ace cannot be used to defend
+        /// 2. Standard rule: same suit/rank
         /// </summary>
         public override bool CanPlayOn(ICardData topCard, GameContext context)
         {
-            // Obrana proti esu: na čekající eso lze přebít vlastním esem.
+            // Defence against Ace: a pending Ace may only be countered with another Ace.
             if (context?.AcePending == true)
             {
-                return true; // tahle karta je eso
+                return true; // this card is an Ace
             }
 
-            // Pokud je aktivní penalizace líznutí (sedma), nelze zahrát eso
+            // If a draw penalty is active (Seven), Ace cannot be played
             if (context?.PendingDrawCount > 0)
             {
                 return false;
             }
 
-            // Pokud je vynucená barva (po dámě), musí souhlasit barva
+            // If a suit is forced (after a Queen), suit must match
             if (context?.ForcedSuit != null)
             {
                 return Suit == context.ForcedSuit.Value;
             }
 
-            // Standardní pravidlo: stejná barva nebo hodnota
+            // Standard rule: same suit or rank
             return MatchesSuitOrRank(topCard);
         }
 
         /// <summary>
-        /// Efekt esa: další hráč musí přebít esem, nebo stojí (přeskočí, nelíže).
+        /// Ace effect: next player must counter with an Ace, or stands (skipped, does not draw).
         /// </summary>
         public override void OnPlay(GameContext context, IPlayerData player)
         {
-            // Zrušit vynucenou barvu
+            // Clear forced suit
             context?.ClearForcedSuit();
 
-            // Eso čeká na reakci dalšího hráče
+            // Ace waits for the next player's response
             if (context != null)
             {
                 context.AcePending = true;
             }
 
-            // Notifikovat o zahrání karty
+            // Notify that the card was played
             context?.NotifyCardPlayed(this, player);
         }
     }

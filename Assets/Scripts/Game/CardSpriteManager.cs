@@ -11,7 +11,7 @@ public class CardSpriteManager : MonoBehaviour
     [SerializeField] private Sprite[] spadeSprites;    // 7, 8, 9, 10, J, Q, K, A
     
     [Header("Alternative: Individual Symbols")]
-    [SerializeField] private Sprite[] symbolSprites;   // Všechny symboly v pořadí: 7,8,9,10,J,Q,K,A
+    [SerializeField] private Sprite[] symbolSprites;   // All symbols in order: 7,8,9,10,J,Q,K,A
     [SerializeField] private Sprite heartSymbol;
     [SerializeField] private Sprite diamondSymbol;
     [SerializeField] private Sprite clubSymbol;
@@ -24,20 +24,20 @@ public class CardSpriteManager : MonoBehaviour
     
     public static CardSpriteManager Instance { get; private set; }
     
-    // Statická metoda pro zajištění existence instance
+    // Static method to ensure instance exists
     public static CardSpriteManager EnsureInstance()
     {
         if (Instance == null)
         {
-            // Hledat existující instanci
+            // Look for existing instance
             Instance = FindObjectOfType<CardSpriteManager>();
             
-            // Pokud neexistuje, vytvořit novou
+            // If none exists, create a new one
             if (Instance == null)
             {
                 GameObject go = new GameObject("CardSpriteManager");
                 Instance = go.AddComponent<CardSpriteManager>();
-                DontDestroyOnLoad(go); // Zachovat mezi scénami
+                DontDestroyOnLoad(go); // Keep across scenes
             }
         }
         
@@ -60,26 +60,26 @@ public class CardSpriteManager : MonoBehaviour
     void InitializeSpriteCache()
     {
         
-        // Načíst sprites pro každou barvu
+        // Load sprites for each suit
         LoadSpritesForSuit(Suit.Hearts, heartSprites);
         LoadSpritesForSuit(Suit.Diamonds, diamondSprites);
         LoadSpritesForSuit(Suit.Clubs, clubSprites);
         LoadSpritesForSuit(Suit.Spades, spadeSprites);
         
-        // Pokud nemáme žádné sprites, zkusit flexibilní načítání
+        // If we have no sprites, try flexible loading
         if (spriteCache.Count == 0)
         {
             LoadSpritesFlexibly();
         }
         
-        // Pokud stále nemáme sprites, vytvořit fallback sprites
+        // If still no sprites, create fallback sprites
         if (spriteCache.Count == 0)
         {
             CreateFallbackSprites();
         }
         
         
-        // Vypsat všechny načtené sprites
+        // Log all loaded sprites
     }
     
     void LoadSpritesForSuit(Suit suit, Sprite[] sprites)
@@ -87,7 +87,7 @@ public class CardSpriteManager : MonoBehaviour
         
         if (sprites == null || sprites.Length == 0)
         {
-            Debug.LogWarning($"[CardSpriteManager] Žádné sprites pro {suit}");
+            Debug.LogWarning($"[CardSpriteManager] No sprites for {suit}");
             return;
         }
         
@@ -115,25 +115,25 @@ public class CardSpriteManager : MonoBehaviour
             return sprite;
         }
         
-        Debug.LogWarning($"[CardSpriteManager] Sprite nenalezen: {key}");
-        Debug.LogWarning($"[CardSpriteManager] Dostupné klíče: {string.Join(", ", spriteCache.Keys)}");
+        Debug.LogWarning($"[CardSpriteManager] Sprite not found: {key}");
+        Debug.LogWarning($"[CardSpriteManager] Available keys: {string.Join(", ", spriteCache.Keys)}");
         
-        // Pokud je cache prázdný, zkusit flexibilní načítání
+        // If cache is empty, try flexible loading
         if (spriteCache.Count == 0)
         {
             LoadSpritesFlexibly();
             
-            // Zkusit znovu najít sprite
+            // Try finding sprite again
             if (spriteCache.TryGetValue(key, out sprite))
             {
                 return sprite;
             }
         }
         
-        // Pokud nemáme sprite, vytvořit fallback
+        // If no sprite, create fallback
         sprite = CreateFallbackSprite(suit, rank);
         
-        // Uložit do cache pro příště
+        // Store in cache for next time
         spriteCache[key] = sprite;
         
         return sprite;
@@ -144,33 +144,33 @@ public class CardSpriteManager : MonoBehaviour
         return cardBackSprite;
     }
     
-    // Vytvoří sprite karty z jednotlivých symbolů
+    // Builds card sprite from individual symbols
     public Sprite CreateCardSpriteFromSymbols(Suit suit, Rank rank)
     {
         if (symbolSprites == null || symbolSprites.Length == 0)
         {
-            Debug.LogWarning("[CardSpriteManager] Symbol sprites nejsou nastaveny!");
+            Debug.LogWarning("[CardSpriteManager] Symbol sprites are not set!");
             return null;
         }
         
-        // Najít správný symbol pro rank
+        // Find correct symbol for rank
         int rankIndex = GetRankIndex(rank);
         if (rankIndex < 0 || rankIndex >= symbolSprites.Length)
         {
-            Debug.LogWarning($"[CardSpriteManager] Neplatný rank index: {rankIndex}");
+            Debug.LogWarning($"[CardSpriteManager] Invalid rank index: {rankIndex}");
             return null;
         }
         
-        // Najít symbol pro suit
+        // Find symbol for suit
         Sprite suitSprite = GetSuitSymbol(suit);
         if (suitSprite == null)
         {
-            Debug.LogWarning($"[CardSpriteManager] Suit symbol nenalezen: {suit}");
+            Debug.LogWarning($"[CardSpriteManager] Suit symbol not found: {suit}");
             return null;
         }
         
-        // Zde byste vytvořili kombinovaný sprite
-        // Pro jednoduchost vrátíme symbol ranku
+        // Here you would build a combined sprite
+        // For simplicity return the rank symbol
         return symbolSprites[rankIndex];
     }
     
@@ -202,12 +202,12 @@ public class CardSpriteManager : MonoBehaviour
         }
     }
     
-    // Automatické načítání spriteů z Resources složky (alternativa)
+    // Automatic sprite loading from Resources folder (alternative)
     [ContextMenu("Load Sprites from Resources")]
     public void LoadSpritesFromResources()
     {
         
-        // Příklad struktury: Resources/Cards/Hearts/7.png, Resources/Cards/Hearts/8.png, atd.
+        // Example structure: Resources/Cards/Hearts/7.png, Resources/Cards/Hearts/8.png, etc.
         Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
         Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
                              Rank.Jack, Rank.Queen, Rank.King, Rank.Ace };
@@ -230,27 +230,27 @@ public class CardSpriteManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning($"[CardSpriteManager] ❌ Sprite nenalezen v Resources: {path}");
+                    Debug.LogWarning($"[CardSpriteManager] ❌ Sprite not found in Resources: {path}");
                 }
             }
         }
         
     }
 
-    // Fallback systém pro vytvoření jednoduchých spriteů
+    // Fallback system for creating simple sprites
     public Sprite CreateFallbackSprite(Suit suit, Rank rank)
     {
         
-        // Vytvořit jednoduchý sprite s textem
+        // Create simple sprite with text
         Texture2D texture = new Texture2D(100, 140);
         Color[] pixels = new Color[100 * 140];
         
-        // Barva pozadí (bílá)
+        // Background colour (white)
         Color backgroundColor = Color.white;
-        // Barva textu (černá)
+        // Text colour (black)
         Color textColor = Color.black;
         
-        // Barva pro různé barvy karet
+        // Colour for different card suits
         switch (suit)
         {
             case Suit.Hearts:
@@ -263,7 +263,7 @@ public class CardSpriteManager : MonoBehaviour
                 break;
         }
         
-        // Vyplnit pozadí
+        // Fill background
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = backgroundColor;
@@ -271,18 +271,18 @@ public class CardSpriteManager : MonoBehaviour
         
         
         
-        // Aplikovat pixely
+        // Apply pixels
         texture.SetPixels(pixels);
         texture.Apply();
         
-        // Vytvořit sprite
+        // Create sprite
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, 100, 140), new Vector2(0.5f, 0.5f));
 
         
         return sprite;
     }
 
-    // Vytvořit všechny fallback sprites
+    // Create all fallback sprites
     void CreateFallbackSprites()
     {
         
@@ -305,29 +305,29 @@ public class CardSpriteManager : MonoBehaviour
         
     }
 
-    // Debug metoda pro kontrolu nastavení
+    // Debug method to check setup
     [ContextMenu("Debug Settings")]
     public void DebugSettings()
     {
     }
 
-    // Kontrola Resources složky
+    // Check Resources folder
     [ContextMenu("Check Resources Folder")]
     public void CheckResourcesFolder()
     {
         
-        // Zkontrolovat existenci Resources složky
+        // Check Resources folder exists
         Object[] allResources = Resources.LoadAll("");
         
-        // Najít všechny sprites
+        // Find all sprites
         Sprite[] allSprites = Resources.LoadAll<Sprite>("");
         
-        // Najít sprites v Cards složce
+        // Find sprites in Cards folder
         Sprite[] cardSprites = Resources.LoadAll<Sprite>("Cards");
         
-        // Vypsat všechny sprites
+        // Log all sprites
         
-        // Zkontrolovat strukturu složek
+        // Check folder structure
         Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
         foreach (var suit in suits)
         {
@@ -336,21 +336,21 @@ public class CardSpriteManager : MonoBehaviour
         
     }
 
-    // Flexibilní načítání spriteů z různých cest
+    // Flexible sprite loading from various paths
     [ContextMenu("Load Sprites Flexibly")]
     public void LoadSpritesFlexibly()
     {
         
-        // Nejdříve zkontrolovat co je v Resources
+        // First check what is in Resources
         Sprite[] allSprites = Resources.LoadAll<Sprite>("");
         
         if (allSprites.Length == 0)
         {
-            Debug.LogWarning("[CardSpriteManager] ❌ Žádné sprites v Resources složce!");
+            Debug.LogWarning("[CardSpriteManager] ❌ No sprites in the Resources folder!");
             return;
         }
         
-        // Vypsat všechny sprites
+        // Log all sprites
         
         Suit[] suits = { Suit.Hearts, Suit.Diamonds, Suit.Clubs, Suit.Spades };
         Rank[] ranks = { Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, 
@@ -358,7 +358,7 @@ public class CardSpriteManager : MonoBehaviour
         
         int loadedCount = 0;
         
-        // Možné cesty pro načítání (upravené pro váš formát)
+        // Possible load paths (adjusted for your format)
         string[] possiblePaths = {
             "Cards/{suit}_{rank}",              // Cards/clubs_7, Cards/diamonds_Q
             "Cards/{suit}_{rank}.png",          // Cards/clubs_7.png, Cards/diamonds_Q.png
@@ -378,14 +378,14 @@ public class CardSpriteManager : MonoBehaviour
             {
                 string key = GetSpriteKey(suit, rank);
                 
-                // Pokud už máme sprite, přeskočit
+                // If we already have the sprite, skip
                 if (spriteCache.ContainsKey(key))
                 {
                     continue;
                 }
                 
                 
-                // Zkusit různé cesty
+                // Try various paths
                 foreach (var pathTemplate in possiblePaths)
                 {
                     string path = pathTemplate
@@ -398,11 +398,11 @@ public class CardSpriteManager : MonoBehaviour
                     {
                         spriteCache[key] = sprite;
                         loadedCount++;
-                        break; // Našli jsme sprite, pokračovat na další kartu
+                        break; // Found the sprite, continue to the next card
                     }
                 }
                 
-                // Pokud jsme nenašli sprite, zkusit načíst všechny sprites a najít podle jména
+                // If sprite not found, load all sprites and find by name
                 if (!spriteCache.ContainsKey(key))
                 {
                     Sprite foundSprite = FindSpriteByName(suit, rank);
@@ -417,16 +417,16 @@ public class CardSpriteManager : MonoBehaviour
         
     }
     
-    // Najít sprite podle jména
+    // Find sprite by name
     Sprite FindSpriteByName(Suit suit, Rank rank)
     {
-        // Načíst všechny sprites z Resources
+        // Load all sprites from Resources
         Sprite[] allSprites = Resources.LoadAll<Sprite>("");
         
         string suitName = suit.ToString().ToLower();
         string rankName = GetRankShortName(rank).ToLower();
         
-        // Možné názvy pro váš formát
+        // Possible names for your format
         string[] possibleNames = {
             $"{suitName}_{rankName}",           // clubs_7, clubs_a, diamonds_q
             $"{suitName}_{rankName}.png",       // clubs_7.png, clubs_a.png
@@ -452,11 +452,11 @@ public class CardSpriteManager : MonoBehaviour
             }
         }
         
-        Debug.LogWarning($"[CardSpriteManager] ❌ Sprite nenalezen pro {suit}_{rank}");
+        Debug.LogWarning($"[CardSpriteManager] ❌ Sprite not found for {suit}_{rank}");
         return null;
     }
     
-    // Převést rank na krátký název (7, 8, 9, 10, J, Q, K, A)
+    // Convert rank to short name (7, 8, 9, 10, J, Q, K, A)
     string GetRankShortName(Rank rank)
     {
         switch (rank)
@@ -473,7 +473,7 @@ public class CardSpriteManager : MonoBehaviour
         }
     }
 
-    // Test formátu názvů
+    // Test name format
     [ContextMenu("Test Name Format")]
     public void TestNameFormat()
     {
@@ -494,7 +494,7 @@ public class CardSpriteManager : MonoBehaviour
         
     }
     
-    // Zobrazit všechny sprites v Resources
+    // Show all sprites in Resources
     [ContextMenu("Show All Resources Sprites")]
     public void ShowAllResourcesSprites()
     {

@@ -13,22 +13,22 @@ public class PortraitFit : MonoBehaviour
     void OnEnable()
     {
         rt = transform as RectTransform;
-        parentRT = transform.parent as RectTransform;  // <<< klíčové: počítáme z SafeArea
+        parentRT = transform.parent as RectTransform;  // <<< key: we compute from SafeArea
         Apply();
     }
 
-    void OnTransformParentChanged()  // kdyby ses přepojil v hierarchii
+    void OnTransformParentChanged()  // in case it gets re-parented in the hierarchy
     {
         parentRT = transform.parent as RectTransform;
         Apply();
     }
 
-    void OnRectTransformDimensionsChange()  // editor i runtime změny SafeArea
+    void OnRectTransformDimensionsChange()  // editor and runtime SafeArea changes
     {
         Apply();
     }
 
-    void Update()  // fallback pro WebGL/editor
+    void Update()  // fallback for WebGL/editor
     {
         if (!parentRT) return;
         Vector2 parentSize = parentRT.rect.size;
@@ -52,13 +52,13 @@ public class PortraitFit : MonoBehaviour
         float boxW, boxH;
         if (current > TARGET)
         {
-            // Parent je relativně širší → výška limituje
+            // Parent is relatively wider → height limits size
             boxH = ph;
             boxW = ph * TARGET;
         }
         else
         {
-            // Parent je relativně užší → šířka limituje
+            // Parent is relatively narrower → width limits size
             boxW = pw;
             boxH = pw / TARGET;
         }
@@ -68,6 +68,6 @@ public class PortraitFit : MonoBehaviour
 
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, boxW);
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,   boxH);
-        rt.anchoredPosition = Vector2.zero; // centrováno
+        rt.anchoredPosition = Vector2.zero; // centered
     }
 }

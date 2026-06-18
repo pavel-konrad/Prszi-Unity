@@ -1,18 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// SPRÁVNÁ PIPELINE PRO UI ZVUKY:
+/// CORRECT PIPELINE FOR UI SOUNDS:
 /// 1. UI animace → 2. Animation Event → 3. AnimationEventReceiver → 4. AudioEvents
 /// 
-/// Tento přístup zajišťuje:
-/// - Synchronizaci zvuku s vizuální animací
-/// - Lepší UX (zvuk přesně odpovídá vizuálnímu efektu)
-/// - Snadnější údržbu (zvuky jsou v animacích, ne v kódu)
-/// - Flexibilitu (můžeme snadno měnit timing zvuků v animačním editoru)
+/// This approach ensures:
+/// - Sound synchronised with the visual animation
+/// - Better UX (sound matches the visual effect exactly)
+/// - Easier maintenance (sounds live in animations, not in code)
+/// - Flexibility (easy to change sound timing in the animation editor)
 /// </summary>
 public class AnimationEventReceiver : MonoBehaviour
 {
-    // Statická metoda pro automatické přidání komponenty
+    // Static method to automatically add the component
     public static AnimationEventReceiver EnsureComponent(GameObject target)
     {
         var receiver = target.GetComponent<AnimationEventReceiver>();
@@ -23,10 +23,10 @@ public class AnimationEventReceiver : MonoBehaviour
         return receiver;
     }
     
-    // === ZÁKLADNÍ UI ZVUKY ===
+    // === BASIC UI SOUNDS ===
     
     /// <summary>
-    /// Zvuk pro pop animaci (obecný UI zvuk)
+    /// Sound for pop animation (general UI sound)
     /// </summary>
     public void OnPopAnimationStart()
     {
@@ -34,25 +34,25 @@ public class AnimationEventReceiver : MonoBehaviour
     }
     
     /// <summary>
-    /// Zvuk pro hover efekt (stejný jako pop)
+    /// Sound for hover effect (same as pop)
     /// </summary>
     public void OnHoverStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Stejný zvuk jako Pop
+        AudioEvents.TriggerPopAnimation(); // Same sound as Pop
     }
     
     /// <summary>
-    /// Zvuk pro focus efekt (stejný jako pop)
+    /// Sound for focus effect (same as pop)
     /// </summary>
     public void OnFocusStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Stejný zvuk jako Pop
+        AudioEvents.TriggerPopAnimation(); // Same sound as Pop
     }
     
-    // === HRACÍ ZVUKY ===
+    // === GAMEPLAY SOUNDS ===
     
     /// <summary>
-    /// Zvuk pro umístění sázky
+    /// Sound for placing a bet
     /// </summary>
     public void OnBetPlacedStart()
     {
@@ -60,7 +60,7 @@ public class AnimationEventReceiver : MonoBehaviour
     }
     
     /// <summary>
-    /// Zvuk pro rozdání karty
+    /// Sound for dealing a card
     /// </summary>
     public void OnCardDealtStart()
     {
@@ -68,88 +68,88 @@ public class AnimationEventReceiver : MonoBehaviour
     }
     
     /// <summary>
-    /// Zvuk pro odehrání karty
+    /// Sound for playing a card
     /// </summary>
     public void OnCardPlayedStart()
     {
-        AudioEvents.TriggerCardPlayed(); // Zvuk pro kliknutí na kartu
+        AudioEvents.TriggerCardPlayed(); // Sound for clicking a card
     }
     
-    // === KARTA INTERAKCE ===
+    // === CARD INTERACTION ===
     
     /// <summary>
-    /// Zvuk pro stisknutí karty (lehčí než kliknutí)
+    /// Sound for pressing a card (lighter than click)
     /// </summary>
     public void OnCardPressStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Lehký zvuk pro stisknutí
+        AudioEvents.TriggerPopAnimation(); // Light sound for a press
     }
     
     /// <summary>
-    /// Zvuk pro uvolnění karty
+    /// Sound for releasing a card
     /// </summary>
     public void OnCardReleaseStart()
     {
-        // Tichý nebo žádný zvuk pro uvolnění
+        // Quiet or no sound for release
     }
     
     /// <summary>
-    /// Zvuk pro výběr karty
+    /// Sound for selecting a card
     /// </summary>
     public void OnCardSelectStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Zvuk pro výběr karty
+        AudioEvents.TriggerPopAnimation(); // Sound for selecting a card
     }
     
     /// <summary>
-    /// Zvuk pro zrušení výběru karty
+    /// Sound for deselecting a card
     /// </summary>
     public void OnCardDeselectStart()
     {
-        // Tichý nebo žádný zvuk pro zrušení výběru
+        // Quiet or no sound for deselection
     }
     
     /// <summary>
-    /// Zvuk pro kliknutí na kartu
+    /// Sound for clicking a card
     /// </summary>
     public void OnCardClickStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Zvuk pro kliknutí
+        AudioEvents.TriggerPopAnimation(); // Sound for a click
     }
     
     /// <summary>
-    /// Zvuk pro nabití karty (vysunutí)
+    /// Sound for charging a card (slide out)
     /// </summary>
     public void OnCardChargedStart()
     {
-        AudioEvents.TriggerCardSelected(); // Použít stejný zvuk jako pro výběr
+        AudioEvents.TriggerCardSelected(); // Use the same sound as for selection
     }
     
     /// <summary>
-    /// Zvuk pro vybití karty (zajetí zpět)
+    /// Sound for discharging a card (slide back)
     /// </summary>
     public void OnCardDischargedStart()
     {
-        AudioEvents.TriggerCardDeselected(); // Použít stejný zvuk jako pro zrušení výběru
+        AudioEvents.TriggerCardDeselected(); // Use the same sound as for deselection
     }
     
     /// <summary>
-    /// Zvuk pro swipe karty nahoru (do discard)
+    /// Sound for swiping a card up (to discard)
     /// </summary>
     public void OnCardSwipedUpStart()
     {
-        AudioEvents.TriggerCardSwiped(); // Nový specifický zvuk pro swipe
+        AudioEvents.TriggerCardSwiped(); // New specific sound for swipe
     }
     
     /// <summary>
-    /// Dokončení animace swipu karty - karta se může odstranit
+    /// End of card swipe animation — card may be removed
     /// </summary>
     public void OnCardSwipedUpComplete()
     {
-        // Tato metoda se volá z Animation Event na konci animace swipu
-        // Karta se může nyní bezpečně odstranit z ruky
+        // This method is called from an Animation Event at the end of the swipe
+        // Card may now be safely removed from the hand
         
-        // Vyvolat událost dokončení animace
+        // Raise animation-complete event
         var cardUI = GetComponent<CardUI>();
         if (cardUI != null)
         {
@@ -157,20 +157,20 @@ public class AnimationEventReceiver : MonoBehaviour
         }
     }
     
-    // === AVATAR ZVUKY ===
+    // === AVATAR SOUNDS ===
     
     /// <summary>
-    /// Zvuk pro aktivaci hráče
+    /// Sound for player activation
     /// </summary>
     public void OnPlayerActiveStart()
     {
-        AudioEvents.TriggerPopAnimation(); // Použít existující zvuk pro aktivaci
+        AudioEvents.TriggerPopAnimation(); // Use existing sound for activation
     }
     
-    // === MODAL ZVUKY ===
+    // === MODAL SOUNDS ===
     
     /// <summary>
-    /// Zvuk pro umístění sázky v modalu
+    /// Sound for placing a bet in the modal
     /// </summary>
     public void OnModalBetPlacedStart()
     {
@@ -178,49 +178,49 @@ public class AnimationEventReceiver : MonoBehaviour
     }
     
     /// <summary>
-    /// Zvuk pro otevření modalu
+    /// Sound for opening the modal
     /// </summary>
     public void OnModalOpenStart()
     {
-        AudioEvents.TriggerModalOpen(); // Specifický zvuk pro otevření modalu
+        AudioEvents.TriggerModalOpen(); // Specific sound for opening the modal
     }
     
     /// <summary>
-    /// Zvuk pro zavření modalu
+    /// Sound for closing the modal
     /// </summary>
     public void OnModalCloseStart()
     {
-        AudioEvents.TriggerModalClose(); // Specifický zvuk pro zavření modalu
+        AudioEvents.TriggerModalClose(); // Specific sound for closing the modal
     }
     
     /// <summary>
-    /// Zvuk pro kliknutí na tlačítko v modalu
+    /// Sound for clicking a button in the modal
     /// </summary>
     public void OnModalButtonClickStart()
     {
-        AudioEvents.TriggerModalButtonClick(); // Specifický zvuk pro kliknutí na tlačítko
+        AudioEvents.TriggerModalButtonClick(); // Specific sound for a button click
     }
     
     /// <summary>
-    /// Zvuk pro výběr sázky v modalu
+    /// Sound for selecting a bet in the modal
     /// </summary>
     public void OnModalBetSelectedStart()
     {
-        AudioEvents.TriggerBetPlaced(); // Bet zvuk při výběru sázky
+        AudioEvents.TriggerBetPlaced(); // Bet sound when selecting a bet
     }
     
-    // === PENÍZE A CASH ===
+    // === MONEY AND CASH ===
 
     /// <summary>
-    /// Zvuk pro přepočítávání peněz (cash/bet animace)
+    /// Sound for counting money (cash/bet animation)
     /// </summary>
     public void OnCashInDecreaseStart()
     {
-        AudioEvents.TriggerCashIncreased(0.5f); // Zvuk pro animaci peněz
+        AudioEvents.TriggerCashIncreased(0.5f); // Sound for the money animation
     }
     
     /// <summary>
-    /// Zvuk pro zvýšení cash (přibývání peněz)
+    /// Sound for cash increase (money added)
     /// </summary>
     public void OnCashIncreasedStart()
     {
@@ -228,17 +228,17 @@ public class AnimationEventReceiver : MonoBehaviour
     }
     
     /// <summary>
-    /// Zvuk pro snížení cash (odečítání peněz)
+    /// Sound for cash decrease (money deducted)
     /// </summary>
     public void OnCashDecreasedStart()
     {
         AudioEvents.TriggerCashDecreased(0.5f);
     }
     
-    // === HRACÍ STAVY ===
+    // === GAMEPLAY STATES ===
     
     /// <summary>
-    /// Zvuk pro start hry
+    /// Sound for game start
     /// </summary>
     public void OnGameStartStart()
     {

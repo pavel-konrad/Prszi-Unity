@@ -8,11 +8,11 @@ public class PlayerUI : MonoBehaviour
 	public TMP_Text nameText, cashText, betText;
 	public Image avatarImage;
 	public AvatarStateView stateView;
-	public Animator potAnimator; // Animator pro pot animaci
-	public Animator cashAnimator; // Animator pro cash animaci
+	public Animator potAnimator; // Animator for pot animation
+	public Animator cashAnimator; // Animator for cash animation
 
 	Player bound;
-	public Player Bound => bound; // Pro debug
+	public Player Bound => bound; // For debug
 	int lastCash;
 	CanvasGroup canvasGroup;
 
@@ -49,21 +49,21 @@ public class PlayerUI : MonoBehaviour
 
 		if (nameText) nameText.text = bound.Name;
 		
-		// Animované změny pro Cash
+		// Animated Cash changes
 		if (cashText && bound.Cash != lastCash)
 		{
 			
-			// OKAMŽITĚ spustit animaci cash (zvuk se spustí přes Animation Event)
+			// Start cash animation IMMEDIATELY (sound via Animation Event)
 			if (cashAnimator != null)
 			{
 				cashAnimator.SetTrigger("CashChanged");
 			}
 			else
 			{
-				Debug.LogWarning($"[PlayerUI] CashAnimator je null pro {bound.Name}");
+				Debug.LogWarning($"[PlayerUI] CashAnimator is null for {bound.Name}");
 			}
 			
-			// Pak spustit animaci čísla (bez zvuku)
+			// Then animate the number (no sound)
 			StartCoroutine(AnimateNumber(cashText, lastCash, bound.Cash, 0.5f));
 			lastCash = bound.Cash;
 		}
@@ -86,7 +86,7 @@ public class PlayerUI : MonoBehaviour
 			stateView.SetActive(bound.IsActive);
 		}
 
-		// Eliminace: hráč bez peněz zmizí (bar zneviditelný, ale komponenta běží dál).
+		// Elimination: player with no money disappears (bar hidden, component keeps running).
 		if (canvasGroup)
 		{
 			bool alive = bound.Cash > 0;
@@ -95,13 +95,13 @@ public class PlayerUI : MonoBehaviour
 		}
 	}
 
-	// Animace čísla od startValue do endValue
+	// Animate number from startValue to endValue
 	IEnumerator AnimateNumber(TMP_Text text, int startValue, int endValue, float duration)
 	{
 		Color originalColor = text.color;
 		Color targetColor = endValue > startValue ? Color.green : Color.red;
 		
-		// Zvuk se spustí OKAMŽITĚ přes Animation Event, ne až po dokončení animace
+		// Sound plays IMMEDIATELY via Animation Event, not after animation finishes
 		
 		float elapsed = 0f;
 		while (elapsed < duration)
@@ -109,11 +109,11 @@ public class PlayerUI : MonoBehaviour
 			elapsed += Time.deltaTime;
 			float progress = elapsed / duration;
 			
-			// Animace čísla
+			// Number animation
 			int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, progress));
 			text.text = currentValue.ToString();
 			
-			// Animace barvy
+			// Colour animation
 			text.color = Color.Lerp(originalColor, targetColor, progress);
 			
 			yield return null;
@@ -124,7 +124,7 @@ public class PlayerUI : MonoBehaviour
 		
 	}
 
-	// Volitelně: přímá změna avatara z UI (nepřepisuje Player objekt)
+	// Optional: change avatar directly from UI (does not overwrite Player object)
 	public void SetAvatar(Sprite sprite)
 	{
 		if (avatarImage)

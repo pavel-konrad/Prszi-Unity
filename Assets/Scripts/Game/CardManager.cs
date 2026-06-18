@@ -17,11 +17,11 @@ public class CardManager : MonoBehaviour
     public CardStack playerHand;
     
     [Header("UI Components")]
-    public PlayerHand playerHandUI; // UI komponenta pro zobrazení ruky hráče
-    public AIHand[] aiHandUIs; // UI komponenty pro zobrazení AI rukou
+    public PlayerHand playerHandUI; // UI component for displaying the player's hand
+    public AIHand[] aiHandUIs; // UI components for displaying AI hands
     
     [Header("AI Hand Stacks")]
-    public CardStack[] aiHands; // Pole pro AI hand stacky
+    public CardStack[] aiHands; // Array of AI hand stacks
     
     [Header("Dealing Settings")]
     public int cardsPerPlayer = 5;
@@ -34,32 +34,32 @@ public class CardManager : MonoBehaviour
     {
         GameLog.Cards = this;
 
-        // Kontrola referencí
-        if (discard == null) Debug.LogError("[CardManager] Discard není přiřazen!");
-        if (playerHand == null) Debug.LogError("[CardManager] PlayerHand není přiřazen!");
+        // Check references
+        if (discard == null) Debug.LogError("[CardManager] Discard is not assigned!");
+        if (playerHand == null) Debug.LogError("[CardManager] PlayerHand is not assigned!");
         
-        // Automaticky najít PlayerHand UI komponentu
+        // Automatically find PlayerHand UI component
         if (playerHandUI == null)
         {
             playerHandUI = FindObjectOfType<PlayerHand>();
             if (playerHandUI == null)
-                Debug.LogWarning("[CardManager] PlayerHand UI komponenta nebyla nalezena automaticky");
+                Debug.LogWarning("[CardManager] PlayerHand UI component not found automatically");
         }
 
-        // Automaticky najít AIHand UI komponenty
+        // Automatically find AIHand UI components
         if (aiHandUIs == null || aiHandUIs.Length == 0)
         {
             AIHand[] foundAIHands = FindObjectsOfType<AIHand>();
             if (foundAIHands.Length > 0)
                 aiHandUIs = foundAIHands;
             else
-                Debug.LogWarning("[CardManager] AIHand UI komponenty nebyly nalezeny automaticky");
+                Debug.LogWarning("[CardManager] AIHand UI components not found automatically");
         }
         
-        // Kontrola AI hand stacků
+        // Check AI hand stacks
         if (aiHands == null || aiHands.Length == 0)
         {
-            Debug.LogError("[CardManager] AI hand stacky nejsou nastaveny!");
+            Debug.LogError("[CardManager] AI hand stacks are not set!");
         }
         else
         {
@@ -67,7 +67,7 @@ public class CardManager : MonoBehaviour
             {
                 if (aiHands[i] == null)
                 {
-                    Debug.LogError($"[CardManager] AI hand {i} je null! Přiřaďte CardStack objekt do slotu {i}");
+                    Debug.LogError($"[CardManager] AI hand {i} is null! Assign a CardStack object to slot {i}");
                 }
             }
         }
@@ -88,7 +88,7 @@ public class CardManager : MonoBehaviour
     
     public void DealCardsToPlayers()
     {
-        if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand je null!"); return; }
+        if (playerHand == null) { Debug.LogError("[CardManager] PlayerHand is null!"); return; }
 
         GameLog.Clear();
 
@@ -100,11 +100,11 @@ public class CardManager : MonoBehaviour
         // Reset transient rule state so a Seven/Queen/Ace effect can't leak into a new hand.
         GameSession.I.Rules?.ResetRoundState();
 
-        // Vyčistit ruce a odhazovací balíček
+        // Clear hands and discard pile
         playerHand.Clear();
         discard.Clear();
         
-        // Vyčistit AI hand stacky
+        // Clear AI hand stacks
         if (aiHands != null)
         {
             foreach (var aiHand in aiHands)
@@ -113,16 +113,16 @@ public class CardManager : MonoBehaviour
             }
         }
         
-        // Vyčistit ruce všech hráčů
+        // Clear all players' hands
         foreach (var player in GameSession.I.Players)
         {
             player.ClearHand();
         }
         
-        // Rozdat karty
+        // Deal cards
         for (int i = 0; i < cardsPerPlayer; i++)
         {
-            // Karta pro každého hráče (včetně human)
+            // One card per player (human included)
             for (int j = 0; j < GameSession.I.Players.Count; j++)
             {
                 Card card = deck.DrawCard() as Card;
@@ -131,29 +131,29 @@ public class CardManager : MonoBehaviour
                     var player = GameSession.I.Players[j];
                     player.AddCard(card);
                     
-                    // Pro human hráče také přidat do playerHand stacku pro UI
+                    // For human player also add to playerHand stack for UI
                     if (j == 0) // Human player
                     {
                         playerHand.AddCard(card);
                     }
-                    // Pro AI hráče přidat do odpovídajícího AI hand stacku
+                    // For AI player add to matching AI hand stack
                     else if (aiHands != null && j-1 < aiHands.Length && aiHands[j-1] != null)
                     {
                         aiHands[j-1].AddCard(card);
                     }
                     else
                     {
-                        Debug.LogError($"[CardManager] Nemohu přidat kartu do AI hand {j-1}: aiHands je {(aiHands == null ? "null" : "není null")}, délka je {(aiHands == null ? "N/A" : aiHands.Length.ToString())}");
+                        Debug.LogError($"[CardManager] Cannot add card to AI hand {j-1}: aiHands is {(aiHands == null ? "null" : "not null")}, length is {(aiHands == null ? "N/A" : aiHands.Length.ToString())}");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"[CardManager] Chyba: nemohu rozdat kartu pro hráče {j}");
+                    Debug.LogError($"[CardManager] Error: cannot deal a card for player {j}");
                 }
             }
         }
         
-        // Po rozdání karet otočit jednu kartu nahoru do odhazovacího balíčku
+        // After dealing, flip one card face-up onto the discard pile
         Card topCard = deck.DrawCard() as Card;
         if (topCard != null)
         {
@@ -161,7 +161,7 @@ public class CardManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[CardManager] Chyba: nemohu otočit kartu nahoru - balíček je prázdný!");
+            Debug.LogError("[CardManager] Error: cannot flip a card face-up - the deck is empty!");
         }
 
         GameLog.Record("DEAL", "", topCard != null ? topCard.ToString() : "");
@@ -170,48 +170,48 @@ public class CardManager : MonoBehaviour
 #endif
     }
     
-    // Hráč odehrál kartu
+    // Player played a card
     public void PlayCard(Player player, Card card)
     {
-        // Kontrola, zda hráč má kartu v ruce
+        // Check whether player has the card in hand
         if (!player.hand.Contains(card))
         {
-            Debug.LogWarning($"[CardManager] Hráč {player.Name} nemá kartu {card} v ruce!");
+            Debug.LogWarning($"[CardManager] Player {player.Name} doesn't have card {card} in hand!");
             return;
         }
         
-        // Kontrola, zda je karta hratelná
+        // Check whether the card is playable
         if (!CanPlayCard(card))
         {
-            Debug.LogWarning($"[CardManager] Karta {card} není hratelná!");
+            Debug.LogWarning($"[CardManager] Card {card} is not playable!");
             return;
         }
         
-        // Pro human hráče nejdřív odebrat z playerHand stacku a UI
+        // For human player first remove from playerHand stack and UI
         if (player.IsHuman)
         {
             playerHand.RemoveCard(card);
-            // Také odebrat z UI komponenty
+            // Also remove from UI component
             if (playerHandUI != null)
             {
                 playerHandUI.RemoveCard(card);
             }
             else
             {
-                Debug.LogWarning("[CardManager] playerHandUI je null - karta nebyla odebrána z UI!");
+                Debug.LogWarning("[CardManager] playerHandUI is null - card was not removed from UI!");
             }
         }
-        // Pro AI hráče nejdřív odebrat z odpovídajícího AI hand stacku
+        // For AI player first remove from matching AI hand stack
         else
         {
-            int aiIndex = player.Id - 1; // AI hráči mají ID 1, 2, 3...
+            int aiIndex = player.Id - 1; // AI players have IDs 1, 2, 3...
             if (aiHands != null && aiIndex >= 0 && aiIndex < aiHands.Length && aiHands[aiIndex] != null)
             {
                 aiHands[aiIndex].RemoveCard(card);
             }
         }
         
-        // Odehrát kartu
+        // Play the card
         player.RemoveCard(card);
         discard.AddCard(card);
 
@@ -267,12 +267,12 @@ public class CardManager : MonoBehaviour
         return (Suit)best;
     }
     
-    // AI odehrá kartu (deprecated - nyní se používá GameplayState)
+    // AI plays a card (deprecated — GameplayState is used now)
     public void PlayAICard(Player aiPlayer)
     {
         if (aiPlayer.hand.Count > 0)
         {
-            // Najít platnou kartu
+            // Find valid card
             Card cardToPlay = FindPlayableCard(aiPlayer);
             if (cardToPlay != null)
             {
@@ -293,7 +293,7 @@ public class CardManager : MonoBehaviour
         return CardRules.CanPlay(cardToPlay, topCard, GameSession.I.Rules);
     }
     
-    // Získá vrchní kartu z odhazovacího balíčku
+    // Gets top card from discard pile
     public Card GetTopDiscardCard()
     {
         if (discard?.cards != null && discard.cards.Count > 0)
@@ -303,7 +303,7 @@ public class CardManager : MonoBehaviour
         return null;
     }
     
-    // Najde hratelnou kartu v ruce hráče
+    // Finds a playable card in the player's hand
     public Card FindPlayableCard(Player player)
     {
         foreach (Card card in player.hand)
@@ -339,10 +339,10 @@ public class CardManager : MonoBehaviour
         return last;
     }
 
-    // Lízne jednu kartu pro hráče
+    // Draws one card for the player
     Card DrawOneForPlayer(Player player)
     {
-        // Když dojde balíček, doplnit ho z odhazovacího (kromě vrchní karty).
+        // When deck runs out, refill from discard (except top card).
         if (deck.IsEmpty)
         {
             ReshuffleDiscardIntoDeck();
@@ -353,43 +353,43 @@ public class CardManager : MonoBehaviour
 
         if (drawnCard != null)
         {
-            // Pro human hráče nejdřív přidat do UI s CardIn animací
+            // For human player first add to UI with CardIn animation
             if (player.IsHuman)
             {
-                // Přidat kartu do UI s CardIn animací DŘÍV než do dat
+                // Add card to UI with CardIn animation BEFORE data
                 if (playerHandUI != null)
                 {
                     playerHandUI.AddCardToHand(drawnCard);
                 }
                 else
                 {
-                    Debug.LogWarning("[CardManager] playerHandUI je null - CardIn animace se nespustí");
+                    Debug.LogWarning("[CardManager] playerHandUI is null - CardIn animation will not run");
                 }
                 
-                // Pak přidat do dat
+                // Then add to data
                 playerHand.AddCard(drawnCard);
             }
-            // Pro AI hráče přidat do odpovídajícího AI hand stacku
+            // For AI player add to matching AI hand stack
             else
             {
-                int aiIndex = player.Id - 1; // AI hráči mají ID 1, 2, 3...
+                int aiIndex = player.Id - 1; // AI players have IDs 1, 2, 3...
                 if (aiHands != null && aiIndex >= 0 && aiIndex < aiHands.Length && aiHands[aiIndex] != null)
                 {
                     aiHands[aiIndex].AddCard(drawnCard);
                 }
                 
-                // Přidat kartu do AI UI s CardIn animací
+                // Add card to AI UI with CardIn animation
                 if (aiHandUIs != null && aiIndex >= 0 && aiIndex < aiHandUIs.Length && aiHandUIs[aiIndex] != null)
                 {
                     aiHandUIs[aiIndex].AddCard(drawnCard);
                 }
                 else
                 {
-                    Debug.LogWarning($"[CardManager] aiHandUIs[{aiIndex}] je null - CardIn animace se nespustí");
+                    Debug.LogWarning($"[CardManager] aiHandUIs[{aiIndex}] is null - CardIn animation will not run");
                 }
             }
             
-            // Přidat kartu do dat hráče (pro všechny hráče)
+            // Add card to player data (all players)
             player.AddCard(drawnCard);
             
         }
@@ -397,7 +397,7 @@ public class CardManager : MonoBehaviour
         {
             // Deck empty and discard had nothing to recycle (only its top card):
             // a legal late-game exhaustion, not an error.
-            Debug.LogWarning("[CardManager] Balíček i odhazovací jsou vyčerpané - nelze líznout");
+            Debug.LogWarning("[CardManager] Both deck and discard are exhausted - cannot draw");
         }
 
         return drawnCard;
@@ -408,7 +408,7 @@ public class CardManager : MonoBehaviour
     {
         if (discard.cards.Count <= 1)
         {
-            Debug.LogWarning("[CardManager] Nelze přehodit - odhazovací balíček má jen jednu nebo žádnou kartu");
+            Debug.LogWarning("[CardManager] Cannot reshuffle - discard pile has only one or no card");
             return;
         }
 
@@ -434,11 +434,11 @@ public class CardManager : MonoBehaviour
     
     public void ResetForNewRound()
     {
-        // Přesunout všechny karty zpět do balíčku
+        // Move all cards back to the deck
         deck.AddCards(discard.cards);
         deck.AddCards(playerHand.cards);
         
-        // Přesunout karty ze všech hráčů
+        // Move cards from all players
         foreach (var player in GameSession.I.Players)
         {
             deck.AddCards(player.hand);
@@ -447,17 +447,17 @@ public class CardManager : MonoBehaviour
         discard.Clear();
         playerHand.Clear();
         
-        // Vyčistit ruce hráčů
+        // Clear players' hands
         foreach (var player in GameSession.I.Players)
         {
             player.ClearHand();
         }
         
-        // Zamíchat balíček
+        // Shuffle the deck
         deck.Shuffle();
     }
     
-    // Kontrola, zda je konec hry
+    // Check whether the game is over
     public bool IsGameOver()
     {
         int playersWithCards = 0;
@@ -468,7 +468,7 @@ public class CardManager : MonoBehaviour
                 playersWithCards++;
             }
         }
-        return playersWithCards <= 1; // Konec hry když zůstane max 1 hráč s kartami
+        return playersWithCards <= 1; // Game over when at most 1 player has cards left
     }
     
 #if UNITY_EDITOR
@@ -487,7 +487,7 @@ public class CardManager : MonoBehaviour
     }
 #endif
 
-    // Najít vítěze
+    // Find the winner
     public Player GetWinner()
     {
         foreach (var player in GameSession.I.Players)

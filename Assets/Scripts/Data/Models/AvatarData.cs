@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Prsi.Data
 {
     /// <summary>
-    /// Data pro jeden avatar
+    /// Data for a single avatar
     /// </summary>
     [System.Serializable]
     public class AvatarData
